@@ -1,0 +1,10 @@
+{
+  "name": "GeneGuard AI",
+  "short_name": "GeneGuard",
+  "description": "Predict Tomorrow's Health, Today",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#3b82f6",
+  "background_color": "#ffffff",
+  "icons": []
+}
