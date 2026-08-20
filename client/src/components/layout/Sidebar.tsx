@@ -2,7 +2,6 @@ import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { LayoutDashboard, ClipboardList, MessageSquare, FileText, Heart, User, Settings, Shield, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-// @ts-ignore
 import { useAuth } from '@/hooks/useAuth';
 
 interface SidebarProps {
@@ -11,7 +10,7 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
-  const { user } = useAuth() || { user: { role: 'user', name: 'Guest', email: 'guest@example.com', avatar: '' } };
+  const { user } = useAuth();
   const location = useLocation();
 
   const navItems = [
@@ -47,6 +46,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             <NavLink
               key={item.path}
               to={item.path}
+              onClick={onClose}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 ${
                 isActive 
                   ? 'bg-primary-50 dark:bg-primary-500/10 text-primary-600 dark:text-primary-400 font-medium' 
@@ -66,6 +66,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
               <NavLink
                 key={item.path}
                 to={item.path}
+                onClick={onClose}
                 className={({ isActive }) => `flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 ${
                   isActive 
                     ? 'bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 font-medium' 

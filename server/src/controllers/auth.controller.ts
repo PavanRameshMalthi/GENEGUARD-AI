@@ -15,8 +15,10 @@ export const register = async (req: Request, res: Response) => {
     if (userExists) return res.status(400).json(formatResponse(false, null, 'User already exists'));
     
     const user = await User.create({ name, email, password });
+    const token = generateToken(user._id.toString());
     res.status(201).json(formatResponse(true, {
-      _id: user._id, name: user.name, email: user.email, role: user.role, token: generateToken(user._id.toString())
+      token,
+      user: { _id: user._id, name: user.name, email: user.email, role: user.role }
     }));
   } catch (error: any) {
     res.status(500).json(formatResponse(false, null, error.message));
@@ -28,8 +30,10 @@ export const login = async (req: Request, res: Response) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (user && (await user.comparePassword(password))) {
+      const token = generateToken(user._id.toString());
       res.json(formatResponse(true, {
-        _id: user._id, name: user.name, email: user.email, role: user.role, token: generateToken(user._id.toString())
+        token,
+        user: { _id: user._id, name: user.name, email: user.email, role: user.role }
       }));
     } else {
       res.status(401).json(formatResponse(false, null, 'Invalid email or password'));
@@ -44,5 +48,5 @@ export const forgotPassword = async (req: Request, res: Response) => {
 };
 
 export const getMe = async (req: any, res: Response) => {
-  res.json(formatResponse(true, req.user));
+  res.json(formatResponse(true, { user: req.user }));
 };

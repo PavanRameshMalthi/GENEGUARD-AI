@@ -11,21 +11,26 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/useToast';
 
 export default function RegisterPage() {
-  const { register: registerAuth, loading } = useAuth();
+  const { register: registerAuth } = useAuth();
   const { error: showError, success } = useToast();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
   const password = watch("password");
 
   const onSubmit = async (data: any) => {
+    setLoading(true);
     try {
       await registerAuth({ name: data.name, email: data.email, password: data.password });
       success('Account created successfully!');
       navigate('/dashboard');
     } catch (err: any) {
-      showError(err.message || 'Registration failed');
+      const message = err.response?.data?.message || err.message || 'Registration failed';
+      showError(message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -67,7 +72,7 @@ export default function RegisterPage() {
                 type={showPassword ? 'text' : 'password'}
                 icon={<Lock size={18} />}
                 placeholder="••••••••"
-                {...register('password', { required: 'Password is required' })}
+                {...register('password', { required: 'Password is required', minLength: { value: 6, message: 'Password must be at least 6 characters' } })}
                 error={errors.password?.message as string}
               />
               <button

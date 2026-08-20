@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Menu } from 'lucide-react';
 import Sidebar from './Sidebar';
-// @ts-ignore
+import ThemeToggle from '@/components/ui/ThemeToggle';
 import { useAuth } from '@/hooks/useAuth';
 
 interface DashboardLayoutProps {
@@ -11,7 +11,7 @@ interface DashboardLayoutProps {
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title = 'Dashboard' }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { user } = useAuth() || { user: { avatar: '' } };
+  const { user } = useAuth();
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex transition-colors duration-300">
@@ -32,7 +32,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title = 'Da
           </div>
           
           <div className="flex items-center gap-4">
-            {/* ThemeToggle would go here ideally */}
+            <ThemeToggle />
             <div className="flex items-center justify-center h-8 w-8 rounded-full bg-primary-500 text-white font-bold shadow-sm">
               {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
             </div>

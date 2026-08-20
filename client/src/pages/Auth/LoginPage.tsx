@@ -11,20 +11,25 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/useToast';
 
 export default function LoginPage() {
-  const { login, loading } = useAuth();
+  const { login } = useAuth();
   const { error: showError, success } = useToast();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   
   const { register, handleSubmit, formState: { errors } } = useForm();
 
   const onSubmit = async (data: any) => {
+    setLoading(true);
     try {
       await login({ email: data.email, password: data.password });
       success('Logged in successfully!');
       navigate('/dashboard');
     } catch (err: any) {
-      showError(err.message || 'Failed to login');
+      const message = err.response?.data?.message || err.message || 'Failed to login';
+      showError(message);
+    } finally {
+      setLoading(false);
     }
   };
 

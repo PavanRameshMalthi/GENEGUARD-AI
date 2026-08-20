@@ -23,8 +23,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const initAuth = async () => {
       if (token) {
         try {
-          const data = await authService.getMe();
-          setUser(data.user || data.data); // Adjust based on API structure
+          const res = await authService.getMe();
+          // Server returns { success, data: { user } }
+          const userData = res.data?.user || res.user || res.data;
+          if (userData) {
+            setUser(userData);
+          } else {
+            localStorage.removeItem('token');
+            setToken(null);
+          }
         } catch (error) {
           console.error('Auth initialization failed', error);
           localStorage.removeItem('token');
@@ -34,37 +41,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(false);
     };
     initAuth();
-  }, [token]);
+  }, []); // Only run once on mount, not on every token change
 
   const login = async (credentials: any) => {
     const res = await authService.login(credentials);
-    const newToken = res.token || res.data?.token;
-    const userData = res.user || res.data?.user;
+    // Server returns { success, data: { token, user } }
+    const newToken = res.data?.token || res.token;
+    const userData = res.data?.user || res.user;
     
-    if (newToken && userData) {
-      localStorage.setItem('token', newToken);
-      setToken(newToken);
-      setUser(userData);
+    if (!newToken || !userData) {
+      throw new Error(res.message || 'Login failed — invalid response from server');
     }
+
+    localStorage.setItem('token', newToken);
+    setToken(newToken);
+    setUser(userData);
   };
 
   const register = async (userData: any) => {
     const res = await authService.register(userData);
-    const newToken = res.token || res.data?.token;
-    const newUserData = res.user || res.data?.user;
+    // Server returns { success, data: { token, user } }
+    const newToken = res.data?.token || res.token;
+    const newUserData = res.data?.user || res.user;
     
-    if (newToken && newUserData) {
-      localStorage.setItem('token', newToken);
-      setToken(newToken);
-      setUser(newUserData);
+    if (!newToken || !newUserData) {
+      throw new Error(res.message || 'Registration failed — invalid response from server');
     }
+
+    localStorage.setItem('token', newToken);
+    setToken(newToken);
+    setUser(newUserData);
   };
 
   const logout = () => {
     localStorage.removeItem('token');
     setToken(null);
     setUser(null);
-    window.location.href = '/login';
   };
 
   const updateUser = (updatedUser: User) => {

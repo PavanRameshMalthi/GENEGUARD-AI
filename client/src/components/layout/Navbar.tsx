@@ -2,14 +2,11 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Shield, Menu, X, User, Settings as SettingsIcon, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-// @ts-ignore - mock hook
 import { useAuth } from '@/hooks/useAuth';
-// @ts-ignore - mock hook
-import { useTheme } from '@/hooks/useTheme';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 
 const Navbar: React.FC = () => {
-  const { user, logout } = useAuth() || { user: null, logout: () => {} };
-  const { theme, setTheme } = useTheme() || { theme: 'light', setTheme: () => {} };
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
@@ -17,10 +14,6 @@ const Navbar: React.FC = () => {
   const handleLogout = () => {
     logout();
     navigate('/');
-  };
-
-  const handleToggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
   return (
@@ -35,12 +28,7 @@ const Navbar: React.FC = () => {
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
-            <button
-              onClick={handleToggleTheme}
-              className="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-300"
-            >
-              {theme === 'dark' ? 'Light' : 'Dark'}
-            </button>
+            <ThemeToggle />
             
             {user ? (
               <div className="relative">
@@ -86,7 +74,8 @@ const Navbar: React.FC = () => {
             )}
           </div>
 
-          <div className="flex items-center md:hidden">
+          <div className="flex items-center md:hidden gap-2">
+            <ThemeToggle />
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="p-2 text-gray-600 dark:text-gray-300"

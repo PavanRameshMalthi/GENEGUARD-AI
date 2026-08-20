@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: '/api',
 });
 
 api.interceptors.request.use((config) => {
@@ -17,7 +17,8 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
-      window.location.href = '/login';
+      // Don't hard-redirect here — let AuthContext/ProtectedRoute handle it
+      // to avoid redirect loops and double navigation
     }
     return Promise.reject(error);
   }

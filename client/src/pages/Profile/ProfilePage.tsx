@@ -7,11 +7,12 @@ import Button from '@/components/ui/Button';
 import Textarea from '@/components/ui/Textarea';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/useToast';
+import { userService } from '@/services/user.service';
 import { User } from 'lucide-react';
 
 export default function ProfilePage() {
-  const { user } = useAuth();
-  const { success } = useToast();
+  const { user, updateUser } = useAuth();
+  const { success, error: showError } = useToast();
   const { register, handleSubmit } = useForm({
     defaultValues: {
       name: user?.name || '',
@@ -23,8 +24,17 @@ export default function ProfilePage() {
     }
   });
 
-  const onSubmit = (data: any) => {
-    success('Profile updated successfully');
+  const onSubmit = async (data: any) => {
+    try {
+      const res = await userService.updateProfile(data);
+      const updated = res.data || res;
+      if (updated) {
+        updateUser(updated);
+      }
+      success('Profile updated successfully');
+    } catch (err: any) {
+      showError(err.response?.data?.message || 'Failed to update profile');
+    }
   };
 
   return (

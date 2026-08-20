@@ -3,15 +3,23 @@ import { motion } from 'framer-motion';
 
 interface ProgressBarProps {
   value: number;
-  color?: string;
+  color?: 'primary' | 'accent' | 'green' | 'red' | 'yellow';
   size?: 'sm' | 'md' | 'lg';
   animated?: boolean;
   label?: string;
 }
 
+const colorMap: Record<string, string> = {
+  primary: 'bg-primary-500',
+  accent: 'bg-accent-500',
+  green: 'bg-green-500',
+  red: 'bg-red-500',
+  yellow: 'bg-yellow-500',
+};
+
 const ProgressBar: React.FC<ProgressBarProps> = ({
   value,
-  color = 'bg-primary-500',
+  color = 'primary',
   size = 'md',
   animated = true,
   label,
@@ -21,6 +29,8 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
     md: 'h-2.5',
     lg: 'h-4',
   };
+
+  const bgColor = colorMap[color] || colorMap.primary;
 
   return (
     <div className="w-full">
@@ -32,11 +42,10 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
       )}
       <div className={`w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden ${sizeClasses[size]}`}>
         <motion.div
-          className={`h-full rounded-full ${color} ${animated ? 'animate-pulse' : ''}`}
+          className={`h-full rounded-full ${bgColor}`}
           initial={{ width: 0 }}
           animate={{ width: `${value}%` }}
           transition={{ duration: 0.5, ease: "easeOut" }}
-          style={{ background: `linear-gradient(90deg, var(--tw-gradient-stops))` }}
         />
       </div>
     </div>
