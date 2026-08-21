@@ -29,53 +29,6 @@ export interface UserSettings {
   };
 }
 
-export interface Assessment {
-  _id: string;
-  userId: string;
-  personalInfo: PersonalInfo;
-  lifestyle: Lifestyle;
-  medical: MedicalInfo;
-  aiAnalysis?: AIAnalysis;
-  createdAt: string;
-}
-
-export interface PersonalInfo {
-  name: string;
-  age: number;
-  gender: string;
-  height: number;
-  weight: number;
-  bloodGroup: string;
-}
-
-export interface Lifestyle {
-  smoking: string;
-  alcohol: string;
-  exercise: string;
-  sleep: number;
-  waterIntake: number;
-  stress: string;
-}
-
-export interface MedicalInfo {
-  familyHistory: string[];
-  medicalHistory: string[];
-  symptoms: string[];
-}
-
-export interface AIAnalysis {
-  healthScore: number;
-  healthSummary: string;
-  riskFactors: string[];
-  lifestyleImprovements: string[];
-  dietSuggestions: string[];
-  exerciseSuggestions: string[];
-  hydrationAdvice: string;
-  mentalWellnessTips: string[];
-  preventiveCheckups: string[];
-  whenToVisitDoctor: string;
-}
-
 export interface ChatMessageType {
   role: 'user' | 'assistant';
   content: string;
@@ -90,22 +43,6 @@ export interface Report {
   filePath: string;
   aiSummary?: string;
   createdAt: string;
-}
-
-export interface Recommendation {
-  id: string;
-  category: 'exercise' | 'diet' | 'water' | 'sleep' | 'mental';
-  title: string;
-  description: string;
-  icon: string;
-}
-
-export interface WeeklyGoal {
-  id: string;
-  title: string;
-  target: string;
-  progress: number;
-  category: string;
 }
 
 export interface ApiResponse<T = any> {
@@ -136,4 +73,152 @@ export interface ToastMessage {
   title: string;
   message?: string;
   duration?: number;
+}
+
+export interface Recommendation {
+  category: 'diet' | 'exercise' | 'general' | string;
+  title: string;
+  description: string;
+}
+
+// Assessment-related types
+export interface PersonalInfo {
+  name: string;
+  age: number;
+  gender: string;
+  height: number;
+  weight: number;
+  bloodGroup: string;
+}
+
+export interface Lifestyle {
+  smoking: string;
+  alcohol: string;
+  dailyWaterIntake: number;
+  sleepHours: number;
+  wakeUpTime: string;
+  bedTime: string;
+  dailyScreenTime: number;
+  stressLevel: number;
+  occupation: string;
+  workingHours: number;
+}
+
+export interface PhysicalActivity {
+  dailyWalkingMinutes: number;
+  stepsPerDay: number;
+  exerciseFrequency: string;
+  exerciseType: string;
+  workoutDuration: number;
+}
+
+export interface Nutrition {
+  mealsPerDay: number;
+  fruitsPerWeek: number;
+  vegetablesPerWeek: number;
+  fastFoodFrequency: string;
+  sugarIntake: string;
+  waterIntake: number;
+}
+
+export interface MedicalHistory {
+  diabetes: boolean;
+  bloodPressure: boolean;
+  heartDisease: boolean;
+  asthma: boolean;
+  thyroid: boolean;
+  cholesterol: boolean;
+  allergies: string;
+}
+
+export interface FamilyHistory {
+  diabetes: boolean;
+  heartDisease: boolean;
+  cancer: boolean;
+  hypertension: boolean;
+  kidneyDisease: boolean;
+}
+
+export interface Calculations {
+  bmi: number;
+  bmiCategory: string;
+  idealWeightMin: number;
+  idealWeightMax: number;
+  dailyWaterRequirement: number;
+  recommendedSleep: number;
+  caloriesNeeded: number;
+  activityLevel: string;
+  healthScore: number;
+  riskLevel: string;
+}
+
+export interface ExerciseItem {
+  name: string;
+  duration: string;
+  caloriesBurned: string;
+  frequency: string;
+  difficulty: string;
+}
+
+export interface DietPlan {
+  breakfast: string[];
+  lunch: string[];
+  dinner: string[];
+  snacks: string[];
+  avoidFoods: string[];
+  healthyFoods: string[];
+  proteinTips: string;
+  fiberTips: string;
+  sugarReduction: string;
+}
+
+export interface ExercisePlan {
+  beginner: ExerciseItem[];
+  intermediate: ExerciseItem[];
+  advanced: ExerciseItem[];
+}
+
+export interface SleepAnalysis {
+  quality: string;
+  idealBedTime: string;
+  idealWakeTime: string;
+  tips: string[];
+}
+
+export interface HydrationAnalysis {
+  goal: number;
+  current: number;
+  remaining: number;
+  tips: string[];
+}
+
+export interface AIAnalysis {
+  overallHealthSummary: string;
+  healthScore: number;
+  riskFactors: string[];
+  dietPlan: DietPlan;
+  exercisePlan: ExercisePlan;
+  sleepAnalysis: SleepAnalysis;
+  hydrationAnalysis: HydrationAnalysis;
+  stressManagement: string[];
+  lifestyleImprovements: string[];
+  weeklyGoals: string[];
+  preventiveHealthAdvice: string[];
+  medicalCheckupSuggestions: string[];
+  whenToVisitDoctor: string;
+}
+
+export interface Assessment {
+  _id: string;
+  userId: string;
+  personalInfo: PersonalInfo;
+  lifestyle: Lifestyle;
+  physicalActivity: PhysicalActivity;
+  nutrition: Nutrition;
+  medicalHistory: MedicalHistory;
+  familyHistory: FamilyHistory;
+  symptoms: string[];
+  calculations: Calculations;
+  aiAnalysis?: AIAnalysis;
+  createdAt: string;
 }

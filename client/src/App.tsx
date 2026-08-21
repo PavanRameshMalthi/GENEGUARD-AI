@@ -3,6 +3,7 @@ import { lazy, Suspense } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider, useAuthContext } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
+import { SidebarProvider } from './context/SidebarContext';
 import Toast from './components/ui/Toast';
 import LoadingScreen from './components/ui/LoadingScreen';
 
@@ -71,10 +72,12 @@ function App() {
     <ThemeProvider>
       <ToastProvider>
         <AuthProvider>
-          <BrowserRouter>
-            <AppRoutes />
-            <Toast />
-          </BrowserRouter>
+          <SidebarProvider>
+            <BrowserRouter>
+              <AppRoutes />
+              <Toast />
+            </BrowserRouter>
+          </SidebarProvider>
         </AuthProvider>
       </ToastProvider>
     </ThemeProvider>

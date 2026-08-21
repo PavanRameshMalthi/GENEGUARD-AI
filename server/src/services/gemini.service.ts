@@ -5,7 +5,23 @@ const SYSTEM_PROMPT = `You are GeneGuard AI, a preventive healthcare assistant. 
 
 export const analyzeHealth = async (assessmentData: any) => {
   const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-  const prompt = `${SYSTEM_PROMPT}\nAnalyze the following health data and provide a JSON response with keys: healthScore (0-100), healthSummary, riskFactors (array of strings), lifestyleImprovements (array of strings), dietSuggestions (array of strings), exerciseSuggestions (array of strings), hydrationAdvice, mentalWellnessTips (array of strings), preventiveCheckups (array of strings), whenToVisitDoctor.\nData: ${JSON.stringify(assessmentData)}`;
+  const prompt = `${SYSTEM_PROMPT}\nAnalyze the following comprehensive health data and provide a JSON response exactly matching this structure (do not include markdown codeblocks, just valid JSON):
+  {
+    "overallHealthSummary": "string",
+    "healthScore": number,
+    "riskFactors": ["string"],
+    "dietPlan": { "breakfast": ["string"], "lunch": ["string"], "dinner": ["string"], "snacks": ["string"], "avoidFoods": ["string"], "healthyFoods": ["string"], "proteinTips": "string", "fiberTips": "string", "sugarReduction": "string" },
+    "exercisePlan": { "beginner": [{"name":"string","duration":"string","caloriesBurned":"string","frequency":"string","difficulty":"string"}], "intermediate": [{"name":"string","duration":"string","caloriesBurned":"string","frequency":"string","difficulty":"string"}], "advanced": [{"name":"string","duration":"string","caloriesBurned":"string","frequency":"string","difficulty":"string"}] },
+    "sleepAnalysis": { "quality": "string", "idealBedTime": "string", "idealWakeTime": "string", "tips": ["string"] },
+    "hydrationAnalysis": { "goal": number, "current": number, "remaining": number, "tips": ["string"] },
+    "stressManagement": ["string"],
+    "lifestyleImprovements": ["string"],
+    "weeklyGoals": ["string"],
+    "preventiveHealthAdvice": ["string"],
+    "medicalCheckupSuggestions": ["string"],
+    "whenToVisitDoctor": "string"
+  }
+  \nData: ${JSON.stringify(assessmentData)}`;
   
   try {
     const result = await model.generateContent({ contents: [{ role: 'user', parts: [{ text: prompt }] }], generationConfig: { temperature: 0.7 }});
@@ -52,9 +68,10 @@ export const analyzeReport = async (fileName: string, fileType: string) => {
   }
 };
 
-export const generateRecommendations = async (userProfile: any) => {
+export const generateRecommendations = async (assessmentData: any) => {
+  if (!assessmentData) return ['Please complete a health assessment first to receive personalized recommendations.'];
   const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-  const prompt = `${SYSTEM_PROMPT}\nGenerate personalized daily health tips based on this profile: ${JSON.stringify(userProfile)}. Return a JSON array of strings.`;
+  const prompt = `${SYSTEM_PROMPT}\nGenerate personalized daily health tips based on this assessment data: ${JSON.stringify(assessmentData)}. Return a JSON array of strings.`;
   
   try {
     const result = await model.generateContent({ contents: [{ role: 'user', parts: [{ text: prompt }] }], generationConfig: { temperature: 0.7 }});
@@ -66,9 +83,10 @@ export const generateRecommendations = async (userProfile: any) => {
   }
 };
 
-export const generateWeeklyGoals = async (userProfile: any) => {
+export const generateWeeklyGoals = async (assessmentData: any) => {
+  if (!assessmentData) return ['Please complete a health assessment first to receive personalized weekly goals.'];
   const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-  const prompt = `${SYSTEM_PROMPT}\nGenerate weekly health goals based on this profile: ${JSON.stringify(userProfile)}. Return a JSON array of strings.`;
+  const prompt = `${SYSTEM_PROMPT}\nGenerate weekly health goals based on this assessment data: ${JSON.stringify(assessmentData)}. Return a JSON array of strings.`;
   
   try {
     const result = await model.generateContent({ contents: [{ role: 'user', parts: [{ text: prompt }] }], generationConfig: { temperature: 0.7 }});

@@ -7,19 +7,25 @@ import AuthLayout from '@/components/layout/AuthLayout';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
+import { validateEmail } from '@/utils/validation';
 
 export default function ForgotPasswordPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { register, handleSubmit, formState: { errors }, getValues } = useForm();
+  const { register, handleSubmit, formState: { errors, isValid, dirtyFields }, getValues } = useForm({
+    mode: 'onChange',
+    defaultValues: {
+      email: ''
+    }
+  });
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async () => {
     setLoading(true);
     // Simulate API call
     setTimeout(() => {
       setLoading(false);
       setIsSubmitted(true);
-    }, 1500);
+    }, 1200);
   };
 
   return (
@@ -34,22 +40,32 @@ export default function ForgotPasswordPage() {
             <>
               <div className="text-center mb-8">
                 <h1 className="text-2xl font-bold mb-2">Reset Password</h1>
-                <p className="text-gray-600 dark:text-gray-400">
+                <p className="text-gray-600 dark:text-gray-400 text-sm">
                   Enter your email address and we'll send you instructions to reset your password.
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
                 <Input
                   label="Email Address"
                   type="email"
                   icon={<Mail size={18} />}
                   placeholder="you@example.com"
-                  {...register('email', { required: 'Email is required' })}
-                  error={errors.email?.message as string}
+                  {...register('email', {
+                    validate: (val) => validateEmail(val) || true
+                  })}
+                  error={dirtyFields.email ? (errors.email?.message as string) : undefined}
+                  isSuccess={Boolean(dirtyFields.email && !errors.email)}
+                  required
                 />
                 
-                <Button type="submit" className="w-full" loading={loading} size="lg">
+                <Button 
+                  type="submit" 
+                  className="w-full" 
+                  loading={loading} 
+                  disabled={!isValid || loading}
+                  size="lg"
+                >
                   Send Reset Link
                 </Button>
               </form>
@@ -59,12 +75,12 @@ export default function ForgotPasswordPage() {
               <motion.div 
                 initial={{ scale: 0 }} 
                 animate={{ scale: 1 }} 
-                className="w-16 h-16 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6"
+                className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6"
               >
                 <CheckCircle size={32} />
               </motion.div>
               <h2 className="text-2xl font-bold mb-4">Check your email</h2>
-              <p className="text-gray-600 dark:text-gray-400 mb-8">
+              <p className="text-gray-600 dark:text-gray-400 mb-8 text-sm">
                 We've sent password reset instructions to <strong>{getValues('email')}</strong>
               </p>
             </div>

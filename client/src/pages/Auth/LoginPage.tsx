@@ -9,6 +9,7 @@ import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/useToast';
+import { validateEmail, validatePassword, sanitizeText } from '@/utils/validation';
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -17,16 +18,24 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, formState: { errors, isValid, dirtyFields } } = useForm({
+    mode: 'onChange',
+    defaultValues: {
+      email: '',
+      password: '',
+      rememberMe: false
+    }
+  });
 
   const onSubmit = async (data: any) => {
     setLoading(true);
     try {
-      await login({ email: data.email, password: data.password });
+      const sanitizedEmail = sanitizeText(data.email).toLowerCase();
+      await login({ email: sanitizedEmail, password: data.password });
       success('Logged in successfully!');
       navigate('/dashboard');
     } catch (err: any) {
-      const message = err.response?.data?.message || err.message || 'Failed to login';
+      const message = err.response?.data?.message || err.response?.data?.errors?.[0]?.msg || err.message || 'Failed to login';
       showError(message);
     } finally {
       setLoading(false);
@@ -46,14 +55,18 @@ export default function LoginPage() {
             <p className="text-gray-600 dark:text-gray-400">Log in to your GeneGuard AI account</p>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
             <Input
               label="Email Address"
               type="email"
               icon={<Mail size={18} />}
               placeholder="you@example.com"
-              {...register('email', { required: 'Email is required' })}
-              error={errors.email?.message as string}
+              {...register('email', {
+                validate: (val) => validateEmail(val) || true
+              })}
+              error={dirtyFields.email ? (errors.email?.message as string) : undefined}
+              isSuccess={Boolean(dirtyFields.email && !errors.email)}
+              required
             />
             
             <div className="relative">
@@ -62,13 +75,18 @@ export default function LoginPage() {
                 type={showPassword ? 'text' : 'password'}
                 icon={<Lock size={18} />}
                 placeholder="••••••••"
-                {...register('password', { required: 'Password is required' })}
-                error={errors.password?.message as string}
+                {...register('password', {
+                  validate: (val) => validatePassword(val) || true
+                })}
+                error={dirtyFields.password ? (errors.password?.message as string) : undefined}
+                isSuccess={Boolean(dirtyFields.password && !errors.password)}
+                required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-9 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-9 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                tabIndex={-1}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -76,7 +94,11 @@ export default function LoginPage() {
 
             <div className="flex items-center justify-between text-sm">
               <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" className="rounded text-primary-600 focus:ring-primary-500" />
+                <input 
+                  type="checkbox" 
+                  {...register('rememberMe')}
+                  className="rounded border-gray-300 text-primary-600 focus:ring-primary-500" 
+                />
                 <span className="text-gray-600 dark:text-gray-400">Remember me</span>
               </label>
               <Link to="/forgot-password" className="text-primary-600 hover:text-primary-500 font-medium">
@@ -84,7 +106,13 @@ export default function LoginPage() {
               </Link>
             </div>
 
-            <Button type="submit" className="w-full" loading={loading} size="lg">
+            <Button 
+              type="submit" 
+              className="w-full" 
+              loading={loading} 
+              disabled={!isValid || loading}
+              size="lg"
+            >
               Log In
             </Button>
           </form>

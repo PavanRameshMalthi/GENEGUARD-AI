@@ -1,0 +1,38 @@
+import { body } from 'express-validator';
+
+export const registerValidator = [
+  body('name')
+    .trim()
+    .notEmpty().withMessage('Name is required')
+    .isLength({ min: 2, max: 100 }).withMessage('Name must be between 2 and 100 characters')
+    .matches(/^[a-zA-Z\s\-'.]+$/).withMessage('Name can only contain letters, spaces, hyphens, and apostrophes'),
+  
+  body('email')
+    .trim()
+    .notEmpty().withMessage('Email is required')
+    .isEmail().withMessage('Valid email address is required')
+    .normalizeEmail(),
+
+  body('password')
+    .notEmpty().withMessage('Password is required')
+    .isLength({ min: 6, max: 128 }).withMessage('Password must be between 6 and 128 characters')
+];
+
+export const loginValidator = [
+  body('email')
+    .trim()
+    .notEmpty().withMessage('Email is required')
+    .isEmail().withMessage('Valid email address is required')
+    .normalizeEmail(),
+
+  body('password')
+    .notEmpty().withMessage('Password is required')
+];
+
+export const forgotPasswordValidator = [
+  body('email')
+    .trim()
+    .notEmpty().withMessage('Email is required')
+    .isEmail().withMessage('Valid email address is required')
+    .normalizeEmail()
+];

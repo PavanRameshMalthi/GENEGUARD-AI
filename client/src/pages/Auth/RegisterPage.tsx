@@ -9,6 +9,7 @@ import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/useToast';
+import { validateName, validateEmail, validatePassword, sanitizeText } from '@/utils/validation';
 
 export default function RegisterPage() {
   const { register: registerAuth } = useAuth();
@@ -17,17 +18,28 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   
-  const { register, handleSubmit, watch, formState: { errors } } = useForm();
-  const password = watch("password");
+  const { register, handleSubmit, watch, formState: { errors, isValid, dirtyFields } } = useForm({
+    mode: 'onChange',
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: ''
+    }
+  });
+
+  const password = watch('password');
 
   const onSubmit = async (data: any) => {
     setLoading(true);
     try {
-      await registerAuth({ name: data.name, email: data.email, password: data.password });
+      const sanitizedName = sanitizeText(data.name);
+      const sanitizedEmail = sanitizeText(data.email).toLowerCase();
+      await registerAuth({ name: sanitizedName, email: sanitizedEmail, password: data.password });
       success('Account created successfully!');
       navigate('/dashboard');
     } catch (err: any) {
-      const message = err.response?.data?.message || err.message || 'Registration failed';
+      const message = err.response?.data?.message || err.response?.data?.errors?.[0]?.msg || err.message || 'Registration failed';
       showError(message);
     } finally {
       setLoading(false);
@@ -47,14 +59,18 @@ export default function RegisterPage() {
             <p className="text-gray-600 dark:text-gray-400">Join GeneGuard AI for better health</p>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
             <Input
               label="Full Name"
               type="text"
               icon={<User size={18} />}
               placeholder="John Doe"
-              {...register('name', { required: 'Name is required' })}
-              error={errors.name?.message as string}
+              {...register('name', {
+                validate: (val) => validateName(val) || true
+              })}
+              error={dirtyFields.name ? (errors.name?.message as string) : undefined}
+              isSuccess={Boolean(dirtyFields.name && !errors.name)}
+              required
             />
 
             <Input
@@ -62,8 +78,12 @@ export default function RegisterPage() {
               type="email"
               icon={<Mail size={18} />}
               placeholder="you@example.com"
-              {...register('email', { required: 'Email is required' })}
-              error={errors.email?.message as string}
+              {...register('email', {
+                validate: (val) => validateEmail(val) || true
+              })}
+              error={dirtyFields.email ? (errors.email?.message as string) : undefined}
+              isSuccess={Boolean(dirtyFields.email && !errors.email)}
+              required
             />
             
             <div className="relative">
@@ -72,13 +92,18 @@ export default function RegisterPage() {
                 type={showPassword ? 'text' : 'password'}
                 icon={<Lock size={18} />}
                 placeholder="••••••••"
-                {...register('password', { required: 'Password is required', minLength: { value: 6, message: 'Password must be at least 6 characters' } })}
-                error={errors.password?.message as string}
+                {...register('password', {
+                  validate: (val) => validatePassword(val) || true
+                })}
+                error={dirtyFields.password ? (errors.password?.message as string) : undefined}
+                isSuccess={Boolean(dirtyFields.password && !errors.password)}
+                required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-9 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-9 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                tabIndex={-1}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -90,13 +115,21 @@ export default function RegisterPage() {
               icon={<Lock size={18} />}
               placeholder="••••••••"
               {...register('confirmPassword', { 
-                required: 'Please confirm your password',
-                validate: value => value === password || 'Passwords do not match'
+                required: '❌ Please confirm your password.',
+                validate: value => value === password || '❌ Passwords do not match.'
               })}
-              error={errors.confirmPassword?.message as string}
+              error={dirtyFields.confirmPassword ? (errors.confirmPassword?.message as string) : undefined}
+              isSuccess={Boolean(dirtyFields.confirmPassword && !errors.confirmPassword && password)}
+              required
             />
 
-            <Button type="submit" className="w-full mt-6" loading={loading} size="lg">
+            <Button 
+              type="submit" 
+              className="w-full mt-6" 
+              loading={loading} 
+              disabled={!isValid || loading}
+              size="lg"
+            >
               Register
             </Button>
           </form>

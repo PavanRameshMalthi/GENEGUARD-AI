@@ -1,8 +1,10 @@
 import { generateRecommendations, generateWeeklyGoals } from '../services/gemini.service.js';
+import { Assessment } from '../models/Assessment.js';
 import { formatResponse } from '../utils/helpers.js';
 export const getDailyRecommendations = async (req, res) => {
     try {
-        const recommendations = await generateRecommendations(req.user.profile);
+        const assessment = await Assessment.findOne({ userId: req.user._id }).sort({ createdAt: -1 });
+        const recommendations = await generateRecommendations(assessment);
         res.json(formatResponse(true, recommendations));
     }
     catch (error) {
@@ -11,7 +13,8 @@ export const getDailyRecommendations = async (req, res) => {
 };
 export const getWeeklyGoals = async (req, res) => {
     try {
-        const goals = await generateWeeklyGoals(req.user.profile);
+        const assessment = await Assessment.findOne({ userId: req.user._id }).sort({ createdAt: -1 });
+        const goals = await generateWeeklyGoals(assessment);
         res.json(formatResponse(true, goals));
     }
     catch (error) {

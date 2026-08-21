@@ -12,8 +12,10 @@ export const register = async (req, res) => {
         if (userExists)
             return res.status(400).json(formatResponse(false, null, 'User already exists'));
         const user = await User.create({ name, email, password });
+        const token = generateToken(user._id.toString());
         res.status(201).json(formatResponse(true, {
-            _id: user._id, name: user.name, email: user.email, role: user.role, token: generateToken(user._id.toString())
+            token,
+            user: { _id: user._id, name: user.name, email: user.email, role: user.role }
         }));
     }
     catch (error) {
@@ -25,8 +27,10 @@ export const login = async (req, res) => {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
         if (user && (await user.comparePassword(password))) {
+            const token = generateToken(user._id.toString());
             res.json(formatResponse(true, {
-                _id: user._id, name: user.name, email: user.email, role: user.role, token: generateToken(user._id.toString())
+                token,
+                user: { _id: user._id, name: user.name, email: user.email, role: user.role }
             }));
         }
         else {
@@ -41,5 +45,5 @@ export const forgotPassword = async (req, res) => {
     res.json(formatResponse(true, null, 'Password reset instructions sent to email.'));
 };
 export const getMe = async (req, res) => {
-    res.json(formatResponse(true, req.user));
+    res.json(formatResponse(true, { user: req.user }));
 };

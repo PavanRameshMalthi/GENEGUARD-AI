@@ -18,3 +18,44 @@ export const FEATURES = [
   { title: 'Medical Report Analysis', description: 'Upload reports and get easy-to-understand summaries.' },
   { title: 'Actionable Recommendations', description: 'Daily goals for a healthier lifestyle.' }
 ];
+
+export const SYMPTOMS_LIST = [
+  'Headache', 'Fatigue', 'Chest Pain', 'Fever', 'Dizziness',
+  'Weight Gain', 'Weight Loss', 'Anxiety', 'Depression', 'Back Pain'
+];
+
+export const MEDICAL_CONDITIONS = [
+  'diabetes', 'bloodPressure', 'heartDisease', 'asthma', 'thyroid', 'cholesterol'
+];
+
+export const FAMILY_CONDITIONS = [
+  'diabetes', 'heartDisease', 'cancer', 'hypertension', 'kidneyDisease'
+];
+
+export const EXERCISE_FREQUENCIES = [
+  { label: 'Never', value: 'never' },
+  { label: '1-2 times/week', value: '1-2 times/week' },
+  { label: '3-4 times/week', value: '3-4 times/week' },
+  { label: '5-6 times/week', value: '5-6 times/week' },
+  { label: 'Daily', value: 'daily' }
+];
+
+export const FAST_FOOD_OPTIONS = [
+  { label: 'Never', value: 'never' },
+  { label: 'Once a week', value: 'once a week' },
+  { label: '2-3 times/week', value: '2-3 times/week' },
+  { label: 'Daily', value: 'daily' }
+];
+
+export const SUGAR_INTAKE_OPTIONS = [
+  { label: 'Low', value: 'low' },
+  { label: 'Moderate', value: 'moderate' },
+  { label: 'High', value: 'high' }
+];
+
+export const ALCOHOL_OPTIONS = [
+  { label: 'Never', value: 'never' },
+  { label: 'Occasionally', value: 'occasionally' },
+  { label: 'Frequently', value: 'frequently' }
+];
+

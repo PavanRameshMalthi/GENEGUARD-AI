@@ -9,6 +9,10 @@ export const assessmentService = {
     const res = await api.get('/assessments');
     return res.data;
   },
+  getLatestAssessment: async () => {
+    const res = await api.get('/assessments/latest');
+    return res.data;
+  },
   getAssessment: async (id: string) => {
     const res = await api.get(`/assessments/${id}`);
     return res.data;

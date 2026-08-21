@@ -1,6 +1,0 @@
-import{j as e}from"./index-w3_qKV60.js";import{c as a}from"./createLucideIcon-iCBJen6s.js";/**
- * @license lucide-react v0.469.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */const s=a("CircleCheck",[["circle",{cx:"12",cy:"12",r:"10",key:"1mglay"}],["path",{d:"m9 12 2 2 4-4",key:"dzmm74"}]]),c=({recommendation:r})=>e.jsxs("div",{className:"flex gap-4 p-5 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/30 rounded-2xl shadow-xl shadow-black/5 dark:shadow-black/20 hover:-translate-y-1 transition-all duration-300",children:[e.jsx("div",{className:"mt-1 flex-shrink-0",children:e.jsx(s,{className:"text-primary-500",size:24})}),e.jsxs("div",{children:[e.jsx("div",{className:"flex items-center gap-2 mb-1",children:e.jsx("span",{className:"text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 uppercase tracking-wider",children:r.category})}),e.jsx("h4",{className:"text-base font-semibold text-gray-900 dark:text-white mb-1",children:r.title}),e.jsx("p",{className:"text-sm text-gray-600 dark:text-gray-400",children:r.description})]})]});export{c as R};

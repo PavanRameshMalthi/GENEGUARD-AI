@@ -37,3 +37,18 @@ export const truncateText = (text: string, maxLength: number): string => {
 export const classNames = (...classes: (string | boolean | undefined)[]): string => {
   return classes.filter(Boolean).join(' ');
 };
+
+export const getRiskLevelPercent = (riskLevel: string): number => {
+  const map: Record<string, number> = {
+    'Low': 15,
+    'Moderate': 40,
+    'High': 65,
+    'Very High': 85
+  };
+  return map[riskLevel] || 20;
+};
+
+export const getActivityLevelLabel = (level: string): string => {
+  return level || 'Unknown';
+};
+
