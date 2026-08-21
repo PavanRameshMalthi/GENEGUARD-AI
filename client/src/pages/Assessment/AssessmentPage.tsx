@@ -873,8 +873,9 @@ export default function AssessmentPage() {
                   type="submit" 
                   loading={isSubmitting}
                   disabled={isSubmitting}
+                  className="px-8 py-3 text-base shadow-lg shadow-primary-500/25"
                 >
-                  Submit Assessment
+                  {isSubmitting ? 'Analyzing your health with AI...' : 'Submit Assessment'}
                 </Button>
               )}
             </div>
@@ -882,12 +883,25 @@ export default function AssessmentPage() {
         </Card>
       </div>
 
-      <Modal isOpen={isSubmitting} onClose={() => {}} title="Analyzing Data...">
-        <div className="flex flex-col items-center justify-center p-8 space-y-4">
-          <div className="w-16 h-16 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin"></div>
-          <p className="text-lg font-medium animate-pulse text-gray-800 dark:text-gray-200">
-            AI is validating and processing your health profile...
-          </p>
+      <Modal isOpen={isSubmitting} onClose={() => {}} title="Health Intelligence Engine">
+        <div className="flex flex-col items-center justify-center p-8 space-y-6 text-center">
+          <div className="relative flex items-center justify-center">
+            <div className="w-20 h-20 rounded-full border-4 border-primary-200 dark:border-primary-900/50 border-t-primary-600 animate-spin"></div>
+            <div className="absolute w-12 h-12 bg-primary-500/10 rounded-full flex items-center justify-center animate-pulse">
+              <span className="text-2xl">🧬</span>
+            </div>
+          </div>
+          <div>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+              Analyzing your health with AI...
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 max-w-sm">
+              Processing your biometric metrics, lifestyle factors, and clinical indicators to generate personalized wellness recommendations.
+            </p>
+          </div>
+          <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-1.5 overflow-hidden">
+            <div className="bg-primary-500 h-1.5 rounded-full w-2/3 animate-pulse"></div>
+          </div>
         </div>
       </Modal>
     </DashboardLayout>

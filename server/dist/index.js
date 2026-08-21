@@ -40,4 +40,10 @@ app.use(errorHandler);
 const PORT = ENV.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+    if (ENV.GEMINI_API_KEY) {
+        console.log('✅ Gemini AI Health Intelligence active');
+    }
+    else {
+        console.log('ℹ️ Gemini API key not detected — Clinical Fallback Intelligence active');
+    }
 });

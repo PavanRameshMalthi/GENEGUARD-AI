@@ -1,5 +1,5 @@
 import { Assessment } from '../models/Assessment.js';
-import { analyzeHealth } from '../services/gemini.service.js';
+import { analyzeHealth, generateSmartClinicalAnalysis } from '../services/gemini.service.js';
 import { formatResponse } from '../utils/helpers.js';
 import { computeAllCalculations } from '../utils/calculations.js';
 export const createAssessment = async (req, res) => {
@@ -30,7 +30,17 @@ export const createAssessment = async (req, res) => {
         };
         const calculations = computeAllCalculations(input);
         const combinedData = { ...data, calculations };
-        const aiAnalysis = await analyzeHealth(combinedData);
+        let aiAnalysis;
+        try {
+            aiAnalysis = await analyzeHealth(combinedData);
+        }
+        catch (aiErr) {
+            console.warn('AI analysis error during assessment creation:', aiErr);
+            aiAnalysis = generateSmartClinicalAnalysis(combinedData);
+        }
+        if (!aiAnalysis) {
+            aiAnalysis = generateSmartClinicalAnalysis(combinedData);
+        }
         const assessment = await Assessment.create({
             userId: req.user._id,
             ...combinedData,
@@ -39,7 +49,8 @@ export const createAssessment = async (req, res) => {
         res.status(201).json(formatResponse(true, assessment));
     }
     catch (error) {
-        res.status(500).json(formatResponse(false, null, error.message));
+        console.error('Create Assessment Error:', error);
+        res.status(500).json(formatResponse(false, null, error.message || 'Failed to save health assessment.'));
     }
 };
 export const getLatestAssessment = async (req, res) => {
@@ -47,6 +58,12 @@ export const getLatestAssessment = async (req, res) => {
         const assessment = await Assessment.findOne({ userId: req.user._id }).sort({ createdAt: -1 });
         if (!assessment)
             return res.status(404).json(formatResponse(false, null, 'No assessment found'));
+        // Auto-generate AI analysis if missing on legacy assessment
+        if (!assessment.aiAnalysis || !assessment.aiAnalysis.overallHealthSummary) {
+            const analysis = await analyzeHealth(assessment.toObject());
+            assessment.aiAnalysis = analysis;
+            await assessment.save();
+        }
         res.json(formatResponse(true, assessment));
     }
     catch (error) {
@@ -67,6 +84,12 @@ export const getAssessment = async (req, res) => {
         const assessment = await Assessment.findOne({ _id: req.params.id, userId: req.user._id });
         if (!assessment)
             return res.status(404).json(formatResponse(false, null, 'Assessment not found'));
+        // Auto-generate AI analysis if missing on legacy assessment
+        if (!assessment.aiAnalysis || !assessment.aiAnalysis.overallHealthSummary) {
+            const analysis = await analyzeHealth(assessment.toObject());
+            assessment.aiAnalysis = analysis;
+            await assessment.save();
+        }
         res.json(formatResponse(true, assessment));
     }
     catch (error) {
