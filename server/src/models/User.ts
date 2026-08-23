@@ -24,6 +24,8 @@ export interface IUser extends mongoose.Document {
       analytics?: boolean;
     };
   };
+  createdAt?: Date;
+  updatedAt?: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 

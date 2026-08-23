@@ -9,6 +9,7 @@ interface CardProps {
   glass?: boolean;
   title?: string;
   icon?: React.ReactNode;
+  onClick?: () => void;
 }
 
 const Card: React.FC<CardProps> = ({
@@ -19,6 +20,7 @@ const Card: React.FC<CardProps> = ({
   glass = false,
   title,
   icon,
+  onClick,
 }) => {
   const paddings = {
     none: '',
@@ -49,6 +51,7 @@ const Card: React.FC<CardProps> = ({
     return (
       <motion.div
         whileHover={{ scale: 1.02 }}
+        onClick={onClick}
         className={`${baseClasses} ${bgClasses} ${paddings[padding]} ${className}`}
       >
         {renderContent()}
@@ -57,7 +60,7 @@ const Card: React.FC<CardProps> = ({
   }
 
   return (
-    <div className={`${baseClasses} ${bgClasses} ${paddings[padding]} ${className}`}>
+    <div onClick={onClick} className={`${baseClasses} ${bgClasses} ${paddings[padding]} ${className}`}>
       {renderContent()}
     </div>
   );

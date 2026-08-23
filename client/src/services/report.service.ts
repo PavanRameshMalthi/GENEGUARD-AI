@@ -1,5 +1,5 @@
 import api from './api';
-import { Report, ApiResponse } from '@/types';
+import { Report, ApiResponse, ReportComparisonResult } from '@/types';
 
 export const reportService = {
   uploadReport: async (formData: FormData) => {
@@ -29,8 +29,20 @@ export const reportService = {
     return res.data;
   },
 
+  compareReports: async (reportId1: string, reportId2: string) => {
+    const res = await api.post<ApiResponse<ReportComparisonResult>>('/reports/compare', { reportId1, reportId2 });
+    return res.data;
+  },
+
   downloadHealthReport: async (assessmentId: string) => {
     const res = await api.get<string>(`/reports/health-report/${assessmentId}`, {
+      responseType: 'text'
+    });
+    return res.data;
+  },
+
+  downloadComprehensiveHealthReport: async () => {
+    const res = await api.get<string>('/reports/health-summary/pdf', {
       responseType: 'text'
     });
     return res.data;

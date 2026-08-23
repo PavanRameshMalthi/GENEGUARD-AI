@@ -77,8 +77,15 @@ export interface AdminStats {
   totalAssessments: number;
   totalReports: number;
   totalChats: number;
+  totalTrackingEntries?: number;
+  totalGoals?: number;
+  totalNotifications?: number;
+  totalWeeklyReports?: number;
   recentUsers: User[];
   recentAssessments: Assessment[];
+  adminEmail?: string;
+  systemStatus?: string;
+  timestamp?: string;
 }
 
 export type Theme = 'light' | 'dark' | 'system';
@@ -299,7 +306,7 @@ export interface HealthGoal {
 export interface TimelineEvent {
   _id: string;
   userId: string;
-  eventType: 'assessment' | 'tracking' | 'score_change' | 'weight_change' | 'bmi_change' | 'exercise' | 'sleep' | 'hydration' | 'goal' | 'report' | 'weekly_report' | 'ai_analysis';
+  eventType: 'assessment' | 'tracking' | 'score_change' | 'weight_change' | 'bmi_change' | 'exercise' | 'sleep' | 'hydration' | 'goal' | 'report' | 'weekly_report' | 'ai_analysis' | 'general';
   title: string;
   description: string;
   category: 'assessments' | 'exercise' | 'sleep' | 'hydration' | 'reports' | 'goals' | 'general';
@@ -372,5 +379,180 @@ export interface DynamicScoreResult {
     stressAverage: number;
     goalsCompleted: number;
     totalGoals: number;
+  };
+}
+
+// ==========================================
+// Phase 2 New Types
+// ==========================================
+
+// 1. Preventive Health Calendar
+export interface PreventiveEvent {
+  _id: string;
+  userId: string;
+  title: string;
+  category: 'screening' | 'vaccination' | 'doctor_visit' | 'lab_test' | 'medication_review' | 'lifestyle';
+  description?: string;
+  date: string;
+  time?: string;
+  frequency: 'once' | 'monthly' | 'quarterly' | 'semi-annual' | 'annual';
+  status: 'scheduled' | 'completed' | 'skipped' | 'overdue';
+  doctorName?: string;
+  location?: string;
+  notes?: string;
+  isAiRecommended?: boolean;
+  riskFactorTag?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface RecommendedScreening {
+  title: string;
+  category: 'screening' | 'vaccination' | 'doctor_visit' | 'lab_test' | 'medication_review' | 'lifestyle';
+  description: string;
+  frequency: string;
+  recommendedMonthsAhead: number;
+  riskFactorTag: string;
+  reason: string;
+}
+
+// 2. Family Health Factors
+export interface FamilyMember {
+  _id: string;
+  userId: string;
+  relation: 'father' | 'mother' | 'paternal_grandfather' | 'paternal_grandmother' | 'maternal_grandfather' | 'maternal_grandmother' | 'brother' | 'sister' | 'son' | 'daughter';
+  name?: string;
+  age?: number;
+  isLiving: boolean;
+  conditions: string[];
+  ageOfOnset?: number;
+  notes?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface HereditaryRiskAnalysis {
+  overallRiskScore: number;
+  riskCategory: 'Low' | 'Moderate' | 'High';
+  summary: string;
+  conditionPredispositions: Array<{
+    condition: string;
+    riskScore: number;
+    riskLevel: 'Low' | 'Moderate' | 'High' | 'Very High';
+    affectedRelatives: string[];
+    geneticWeight: string;
+    preventiveGuidelines: string[];
+    screeningBenchmarks: string;
+  }>;
+  preventiveActionPlan: string[];
+  recommendedGeneticConsultation: boolean;
+}
+
+// 3. Achievements & Streaks
+export interface Badge {
+  id: string;
+  title: string;
+  description: string;
+  category: 'streak' | 'activity' | 'assessment' | 'goals' | 'hydration' | 'sleep' | 'mastery';
+  tier: 'bronze' | 'silver' | 'gold' | 'platinum';
+  icon: string;
+  unlockedAt?: string;
+  xpValue: number;
+  isUnlocked?: boolean;
+}
+
+export interface UserStreak {
+  current: number;
+  longest: number;
+  lastDate?: string;
+}
+
+export interface UserAchievement {
+  _id: string;
+  userId: string;
+  streaks: {
+    dailyTracking: UserStreak;
+    hydrationGoal: UserStreak;
+    sleepGoal: UserStreak;
+    stepsGoal: UserStreak;
+  };
+  totalXp: number;
+  level: number;
+  unlockedBadges: Badge[];
+}
+
+export interface AchievementResponse {
+  achievement: UserAchievement;
+  allBadges: Badge[];
+  nextLevelXp: number;
+  currentLevelProgress: number;
+}
+
+// 4. AI Health Copilot
+export interface CopilotResponse {
+  text: string;
+  safety: {
+    isEmergency: boolean;
+    emergencyType?: string;
+    emergencyMessage?: string;
+    flaggedKeywords: string[];
+    safeAdvice?: string;
+  };
+  suggestedActions?: string[];
+  category?: string;
+}
+
+export interface CopilotContextSummary {
+  hasAssessment: boolean;
+  healthScore: number | null;
+  riskLevel: string | null;
+  trackingDaysCount: number;
+  activeGoalsCount: number;
+  reportsCount: number;
+  familyMembersCount: number;
+}
+
+// 5. Medical Report Comparison
+export interface ReportComparisonDelta {
+  metric: string;
+  previousValue: string;
+  currentValue: string;
+  changeValue: string;
+  status: 'improved' | 'stable' | 'deteriorated' | 'neutral';
+  clinicalContext: string;
+}
+
+export interface ReportComparisonResult {
+  report1: { id: string; name: string; date: string };
+  report2: { id: string; name: string; date: string };
+  overallComparisonSummary: string;
+  deltas: ReportComparisonDelta[];
+  improvements: string[];
+  concerns: string[];
+  questionsForDoctor: string[];
+  recommendedActions: string[];
+}
+
+// 6. Admin Analytics
+export interface AdminAnalyticsData {
+  userGrowth: Array<{ date: string; newUsers: number; totalUsers: number }>;
+  riskDistribution: Array<{ name: string; count: number; color: string }>;
+  riskFactorsBreakdown: Array<{ factor: string; prevalence: number; percentage: number }>;
+  reportCategories: Array<{ category: string; count: number }>;
+  goalsTelemetry: {
+    total: number;
+    completed: number;
+    inProgress: number;
+    overdue: number;
+    completionRate: number;
+  };
+  preventiveEventsCount: number;
+  dailyLogsCount: number;
+  aiTelemetry: {
+    geminiActive: boolean;
+    engineModel: string;
+    totalAiQueries: number;
+    estimatedLatencyMs: number;
+    safetyFlaggedIncidents: number;
   };
 }

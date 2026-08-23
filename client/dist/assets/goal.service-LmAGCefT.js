@@ -1,0 +1,1 @@
+import{e}from"./index-VwQ9Pxnm.js";const o={getGoals:async a=>(await e.get("/goals",{params:a})).data,getGoalById:async a=>(await e.get(`/goals/${a}`)).data,createGoal:async a=>(await e.post("/goals",a)).data,updateGoal:async(a,t)=>(await e.put(`/goals/${a}`,t)).data,deleteGoal:async a=>(await e.delete(`/goals/${a}`)).data};export{o as g};

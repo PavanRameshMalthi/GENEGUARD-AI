@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import ReportUpload from '@/components/features/ReportUpload';
 import StructuredReportModal from '@/components/features/StructuredReportModal';
@@ -21,13 +22,15 @@ import {
   Sparkles, 
   RotateCw,
   Calendar,
-  AlertCircle
+  GitCompare,
+  Printer
 } from 'lucide-react';
 
 export default function ReportsPage() {
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [downloadingSummary, setDownloadingSummary] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
@@ -93,20 +96,58 @@ export default function ReportsPage() {
     }
   };
 
+  const handlePrintComprehensiveReport = async () => {
+    try {
+      setDownloadingSummary(true);
+      const html = await reportService.downloadComprehensiveHealthReport();
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.write(html);
+        printWindow.document.close();
+        setTimeout(() => {
+          printWindow.print();
+        }, 500);
+      }
+    } catch {
+      showError('Could not generate health portfolio summary.');
+    } finally {
+      setDownloadingSummary(false);
+    }
+  };
+
   return (
     <DashboardLayout title="Medical Reports">
       <div className="space-y-6 max-w-5xl mx-auto pb-12">
         {/* Header */}
-        <div className="bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl p-6 rounded-3xl border border-gray-200/80 dark:border-gray-800/80 shadow-sm">
-          <div className="flex items-center gap-2 text-primary-600 dark:text-primary-400 font-semibold text-xs uppercase tracking-wider mb-1">
-            <FileText size={14} /> Diagnostic Records
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl p-6 rounded-3xl border border-gray-200/80 dark:border-gray-800/80 shadow-sm">
+          <div>
+            <div className="flex items-center gap-2 text-primary-600 dark:text-primary-400 font-semibold text-xs uppercase tracking-wider mb-1">
+              <FileText size={14} /> Diagnostic Records & Evolution
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+              Medical Reports & Lab History
+            </h1>
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1 max-w-2xl">
+              Upload clinical documents (PDF, JPG, PNG). GeneGuard AI extracts structured educational summaries, tracks trends, and highlights questions for your physician.
+            </p>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-            Medical Reports & Lab History
-          </h1>
-          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1 max-w-2xl">
-            Upload and securely store clinical documents (PDF, JPG, PNG). GeneGuard AI extracts structured educational summaries and questions to ask your physician.
-          </p>
+
+          <div className="flex flex-wrap items-center gap-2.5">
+            <Link to="/reports/compare">
+              <Button variant="outline" size="sm" icon={<GitCompare size={14} />}>
+                Compare Reports
+              </Button>
+            </Link>
+            <Button
+              variant="outline"
+              size="sm"
+              loading={downloadingSummary}
+              onClick={handlePrintComprehensiveReport}
+              icon={<Printer size={14} />}
+            >
+              Export PDF Portfolio
+            </Button>
+          </div>
         </div>
 
         <DisclaimerBanner />

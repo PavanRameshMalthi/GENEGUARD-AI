@@ -1,5 +1,13 @@
 import { Router } from 'express';
-import { getStats, getUsers, getAssessments, getLogs, deleteUser } from '../controllers/admin.controller.js';
+import { 
+  getStats, 
+  getUsers, 
+  getAssessments, 
+  getLogs, 
+  deleteUser, 
+  getAnalytics, 
+  exportAdminMetricsCSV 
+} from '../controllers/admin.controller.js';
 import { authenticateUser } from '../middleware/auth.js';
 import { requireAdmin } from '../middleware/admin.js';
 
@@ -9,6 +17,8 @@ const router = Router();
 router.use(authenticateUser, requireAdmin);
 
 router.get('/stats', getStats);
+router.get('/analytics', getAnalytics);
+router.get('/export-metrics', exportAdminMetricsCSV);
 router.get('/users', getUsers);
 router.delete('/users/:id', deleteUser);
 router.get('/assessments', getAssessments);

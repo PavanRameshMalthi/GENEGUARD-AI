@@ -1,6 +1,10 @@
 import React, { useEffect } from 'react';
 import { 
   LayoutDashboard, 
+  Bot,
+  Calendar,
+  Dna,
+  Trophy,
   Activity,
   History,
   Target,
@@ -38,6 +42,10 @@ export const Sidebar: React.FC = () => {
 
   const navItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
+    { icon: Bot, label: 'AI Health Copilot', path: '/copilot', badge: 'AI', badgeColor: 'bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300' },
+    { icon: Calendar, label: 'Health Calendar', path: '/calendar' },
+    { icon: Dna, label: 'Family Lineage', path: '/family' },
+    { icon: Trophy, label: 'Achievements', path: '/achievements' },
     { icon: Activity, label: 'Daily Tracking', path: '/tracking' },
     { icon: History, label: 'Health Timeline', path: '/timeline' },
     { icon: Target, label: 'Health Goals', path: '/goals' },
@@ -79,6 +87,7 @@ export const Sidebar: React.FC = () => {
               label={item.label}
               path={item.path}
               badge={item.badge}
+              badgeColor={item.badgeColor}
               isCollapsed={isMobile ? false : isCollapsed}
               onClick={isMobile ? closeMobile : undefined}
             />
