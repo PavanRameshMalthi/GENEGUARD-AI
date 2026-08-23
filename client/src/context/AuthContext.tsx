@@ -6,8 +6,8 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   loading: boolean;
-  login: (data: any) => Promise<void>;
-  register: (data: any) => Promise<void>;
+  login: (data: any) => Promise<User>;
+  register: (data: any) => Promise<User>;
   logout: () => void;
   updateUser: (user: User) => void;
 }
@@ -43,7 +43,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     initAuth();
   }, []); // Only run once on mount, not on every token change
 
-  const login = async (credentials: any) => {
+  const login = async (credentials: any): Promise<User> => {
     const res = await authService.login(credentials);
     // Server returns { success, data: { token, user } }
     const newToken = res.data?.token || res.token;
@@ -56,10 +56,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('token', newToken);
     setToken(newToken);
     setUser(userData);
+    return userData;
   };
 
-  const register = async (userData: any) => {
-    const res = await authService.register(userData);
+  const register = async (userDataInput: any): Promise<User> => {
+    const res = await authService.register(userDataInput);
     // Server returns { success, data: { token, user } }
     const newToken = res.data?.token || res.token;
     const newUserData = res.data?.user || res.user;
@@ -71,6 +72,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('token', newToken);
     setToken(newToken);
     setUser(newUserData);
+    return newUserData;
   };
 
   const logout = () => {

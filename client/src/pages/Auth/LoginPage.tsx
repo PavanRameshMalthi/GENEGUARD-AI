@@ -31,9 +31,13 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const sanitizedEmail = sanitizeText(data.email).toLowerCase();
-      await login({ email: sanitizedEmail, password: data.password });
+      const loggedInUser = await login({ email: sanitizedEmail, password: data.password });
       success('Logged in successfully!');
-      navigate('/dashboard');
+      if (loggedInUser?.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err: any) {
       const message = err.response?.data?.message || err.response?.data?.errors?.[0]?.msg || err.message || 'Failed to login';
       showError(message);

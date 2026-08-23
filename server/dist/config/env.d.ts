@@ -4,4 +4,5 @@ export declare const ENV: {
     JWT_SECRET: string;
     GEMINI_API_KEY: string;
     CLIENT_URL: string;
+    ADMIN_EMAIL: string;
 };

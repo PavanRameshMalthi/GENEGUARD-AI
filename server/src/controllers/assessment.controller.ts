@@ -3,6 +3,8 @@ import { Assessment } from '../models/Assessment.js';
 import { analyzeHealth, generateSmartClinicalAnalysis } from '../services/gemini.service.js';
 import { formatResponse } from '../utils/helpers.js';
 import { computeAllCalculations, CalculationInput } from '../utils/calculations.js';
+import { logTimelineEvent } from '../services/timeline.service.js';
+import { createNotification } from '../services/notification.service.js';
 
 export const createAssessment = async (req: any, res: Response) => {
   try {
@@ -50,6 +52,30 @@ export const createAssessment = async (req: any, res: Response) => {
       userId: req.user._id,
       ...combinedData,
       aiAnalysis
+    });
+
+    // Log to Timeline
+    await logTimelineEvent({
+      userId: req.user._id,
+      eventType: 'assessment',
+      title: 'Health Assessment Completed',
+      description: `Health Score: ${calculations.healthScore}/100 • BMI: ${calculations.bmi} (${calculations.bmiCategory}) • Risk: ${calculations.riskLevel}`,
+      category: 'assessments',
+      data: {
+        assessmentId: assessment._id,
+        healthScore: calculations.healthScore,
+        bmi: calculations.bmi,
+        riskLevel: calculations.riskLevel
+      }
+    });
+
+    // Create Notification
+    await createNotification({
+      userId: req.user._id,
+      title: 'Health Assessment Completed',
+      message: `Your health score is ${calculations.healthScore}/100. Review your customized AI nutrition and exercise action plan.`,
+      type: 'system',
+      link: `/assessment/${assessment._id}`
     });
 
     res.status(201).json(formatResponse(true, assessment));

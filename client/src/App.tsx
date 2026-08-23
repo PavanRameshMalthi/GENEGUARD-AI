@@ -14,8 +14,12 @@ const ForgotPasswordPage = lazy(() => import('./pages/Auth/ForgotPasswordPage'))
 const DashboardPage = lazy(() => import('./pages/Dashboard/DashboardPage'));
 const AssessmentPage = lazy(() => import('./pages/Assessment/AssessmentPage'));
 const AssessmentResultPage = lazy(() => import('./pages/Assessment/AssessmentResultPage'));
-const ChatPage = lazy(() => import('./pages/Chat/ChatPage'));
+const DailyTrackingPage = lazy(() => import('./pages/Tracking/DailyTrackingPage'));
+const TimelinePage = lazy(() => import('./pages/Timeline/TimelinePage'));
+const GoalsPage = lazy(() => import('./pages/Goals/GoalsPage'));
 const ReportsPage = lazy(() => import('./pages/Reports/ReportsPage'));
+const WeeklyReportPage = lazy(() => import('./pages/WeeklyReport/WeeklyReportPage'));
+const ChatPage = lazy(() => import('./pages/Chat/ChatPage'));
 const RecommendationsPage = lazy(() => import('./pages/Recommendations/RecommendationsPage'));
 const ProfilePage = lazy(() => import('./pages/Profile/ProfilePage'));
 const SettingsPage = lazy(() => import('./pages/Settings/SettingsPage'));
@@ -52,10 +56,14 @@ const AppRoutes = () => (
       <Route path="/forgot-password" element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
       
       <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+      <Route path="/tracking" element={<ProtectedRoute><DailyTrackingPage /></ProtectedRoute>} />
+      <Route path="/timeline" element={<ProtectedRoute><TimelinePage /></ProtectedRoute>} />
+      <Route path="/goals" element={<ProtectedRoute><GoalsPage /></ProtectedRoute>} />
+      <Route path="/reports" element={<ProtectedRoute><ReportsPage /></ProtectedRoute>} />
+      <Route path="/weekly-reports" element={<ProtectedRoute><WeeklyReportPage /></ProtectedRoute>} />
       <Route path="/assessment" element={<ProtectedRoute><AssessmentPage /></ProtectedRoute>} />
       <Route path="/assessment/:id" element={<ProtectedRoute><AssessmentResultPage /></ProtectedRoute>} />
       <Route path="/chat" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
-      <Route path="/reports" element={<ProtectedRoute><ReportsPage /></ProtectedRoute>} />
       <Route path="/recommendations" element={<ProtectedRoute><RecommendationsPage /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />

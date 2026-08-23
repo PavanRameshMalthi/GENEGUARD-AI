@@ -5,8 +5,12 @@ export const adminService = {
     const res = await api.get('/admin/stats');
     return res.data;
   },
-  getUsers: async (page = 1, limit = 10) => {
+  getUsers: async (page = 1, limit = 20) => {
     const res = await api.get('/admin/users', { params: { page, limit } });
+    return res.data;
+  },
+  deleteUser: async (id: string) => {
+    const res = await api.delete(`/admin/users/${id}`);
     return res.data;
   },
   getAssessments: async (page = 1, limit = 10) => {

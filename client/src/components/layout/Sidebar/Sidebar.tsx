@@ -1,9 +1,13 @@
 import React, { useEffect } from 'react';
 import { 
   LayoutDashboard, 
+  Activity,
+  History,
+  Target,
+  FileText,
+  FileBarChart,
   ClipboardList, 
   MessageSquare, 
-  FileText, 
   Heart, 
   User, 
   Settings, 
@@ -34,9 +38,13 @@ export const Sidebar: React.FC = () => {
 
   const navItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
+    { icon: Activity, label: 'Daily Tracking', path: '/tracking' },
+    { icon: History, label: 'Health Timeline', path: '/timeline' },
+    { icon: Target, label: 'Health Goals', path: '/goals' },
+    { icon: FileText, label: 'Medical Reports', path: '/reports' },
+    { icon: FileBarChart, label: 'Weekly Reports', path: '/weekly-reports' },
     { icon: ClipboardList, label: 'Assessment', path: '/assessment' },
     { icon: MessageSquare, label: 'AI Chat', path: '/chat', badge: 'AI' },
-    { icon: FileText, label: 'Reports', path: '/reports' },
     { icon: Heart, label: 'Recommendations', path: '/recommendations' },
     { icon: User, label: 'Profile', path: '/profile' },
     { icon: Settings, label: 'Settings', path: '/settings' },

@@ -329,27 +329,112 @@ const generateFallbackChatResponse = (userMessage) => {
     }
     return `${advice}\n\n${DISCLAIMER}`;
 };
-export const analyzeReport = async (fileName, fileType) => {
+import fs from 'fs';
+export const analyzeMedicalReport = async (fileName, fileType, filePath) => {
+    const defaultFallback = {
+        summary: `Report "${fileName}" has been recorded. This educational overview outlines potential markers to review with a qualified healthcare professional.`,
+        importantFindings: [`Uploaded file: ${fileName} (${fileType})`],
+        abnormalValues: [],
+        normalValues: [],
+        possibleConcerns: ['Always discuss test results with a medical provider for clinical context.'],
+        questionsForDoctor: [
+            'What do these specific laboratory markers indicate regarding my baseline health?',
+            'Are there any follow-up blood tests or lifestyle modifications you recommend?'
+        ],
+        recommendedFollowUp: ['Schedule a follow-up consultation with your doctor to review findings.'],
+        importantDates: [new Date().toLocaleDateString()]
+    };
     if (!hasGeminiConfigured()) {
-        return `Uploaded report "${fileName}" (${fileType}) has been logged in your health profile. Please consult your physician for clinical interpretation.\n\n${DISCLAIMER}`;
+        return {
+            summary: defaultFallback.summary + `\n\n${DISCLAIMER}`,
+            structuredAnalysis: defaultFallback
+        };
     }
     const client = getGeminiClient();
     if (!client) {
-        return `Uploaded report "${fileName}" (${fileType}) has been logged in your health profile. Please consult your physician for clinical interpretation.\n\n${DISCLAIMER}`;
+        return {
+            summary: defaultFallback.summary + `\n\n${DISCLAIMER}`,
+            structuredAnalysis: defaultFallback
+        };
     }
     try {
         const model = client.getGenerativeModel({ model: 'gemini-2.0-flash' });
-        const prompt = `${SYSTEM_PROMPT}\nThe user has uploaded a medical report of type: ${fileType} named ${fileName}. Provide a helpful, clear preventive educational overview explaining standard key markers associated with this diagnostic category, along with a recommendation to review the findings with their doctor.`;
+        // Prepare prompt with strict safety instructions
+        const promptText = `You are GeneGuard AI, an educational preventive healthcare assistant. 
+CRITICAL MEDICAL SAFETY RULES:
+1. You are NOT diagnosing any disease or medical condition.
+2. Use cautious, educational phrasing such as "Potential finding", "Possible concern", "Discuss with a healthcare professional".
+3. Never invent or hallucinate clinical numbers. Only reference actual markers present in the report or standard reference ranges for this report type.
+4. Always emphasize that this analysis is for educational purposes only.
+
+Analyze the uploaded medical report titled "${fileName}" (type: ${fileType}).
+
+Return a clean, valid JSON object matching this schema exactly without markdown formatting:
+{
+  "summary": "Educational summary of the report",
+  "importantFindings": ["Key finding 1", "Key finding 2"],
+  "abnormalValues": ["Potential elevated/low marker 1", "Potential marker 2"],
+  "normalValues": ["Values within standard reference range"],
+  "possibleConcerns": ["Possible area of concern to discuss with physician"],
+  "questionsForDoctor": ["Question 1 to ask a doctor", "Question 2 to ask a doctor"],
+  "recommendedFollowUp": ["Recommended follow-up step"],
+  "importantDates": ["Date mentioned in report or date of review"]
+}`;
+        const parts = [{ text: promptText }];
+        // If file exists and is image or PDF, attach as inline data if readable
+        if (filePath && fs.existsSync(filePath)) {
+            try {
+                const fileBuffer = fs.readFileSync(filePath);
+                const base64Data = fileBuffer.toString('base64');
+                const mime = fileType.includes('pdf') ? 'application/pdf' : fileType;
+                parts.push({
+                    inlineData: {
+                        data: base64Data,
+                        mimeType: mime
+                    }
+                });
+            }
+            catch (fileErr) {
+                console.warn('[Gemini] File buffer attachment skipped:', fileErr);
+            }
+        }
         const result = await model.generateContent({
-            contents: [{ role: 'user', parts: [{ text: prompt }] }],
-            generationConfig: { temperature: 0.6 }
+            contents: [{ role: 'user', parts }],
+            generationConfig: {
+                temperature: 0.3,
+                responseMimeType: 'application/json'
+            }
         });
-        return result.response.text();
+        const rawText = result.response.text();
+        const sanitized = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+        const parsed = JSON.parse(sanitized);
+        const structuredAnalysis = {
+            summary: parsed.summary || defaultFallback.summary,
+            importantFindings: Array.isArray(parsed.importantFindings) ? parsed.importantFindings : defaultFallback.importantFindings,
+            abnormalValues: Array.isArray(parsed.abnormalValues) ? parsed.abnormalValues : [],
+            normalValues: Array.isArray(parsed.normalValues) ? parsed.normalValues : [],
+            possibleConcerns: Array.isArray(parsed.possibleConcerns) ? parsed.possibleConcerns : defaultFallback.possibleConcerns,
+            questionsForDoctor: Array.isArray(parsed.questionsForDoctor) ? parsed.questionsForDoctor : defaultFallback.questionsForDoctor,
+            recommendedFollowUp: Array.isArray(parsed.recommendedFollowUp) ? parsed.recommendedFollowUp : defaultFallback.recommendedFollowUp,
+            importantDates: Array.isArray(parsed.importantDates) ? parsed.importantDates : defaultFallback.importantDates
+        };
+        let summary = structuredAnalysis.summary;
+        if (!summary.includes(DISCLAIMER)) {
+            summary += `\n\nThis AI-generated summary is for educational purposes only and is not a medical diagnosis. Always discuss lab results with a qualified healthcare professional.`;
+        }
+        return { summary, structuredAnalysis };
     }
     catch (error) {
-        console.error('Gemini report analysis error:', error);
-        return `Uploaded report "${fileName}" (${fileType}) is saved. Please review specific laboratory parameters with your healthcare provider.\n\n${DISCLAIMER}`;
+        console.error('Gemini structured report analysis error:', error);
+        return {
+            summary: defaultFallback.summary + `\n\n${DISCLAIMER}`,
+            structuredAnalysis: defaultFallback
+        };
     }
+};
+export const analyzeReport = async (fileName, fileType, filePath) => {
+    const result = await analyzeMedicalReport(fileName, fileType, filePath);
+    return result.summary;
 };
 export const generateRecommendations = async (assessmentData) => {
     if (!assessmentData) {

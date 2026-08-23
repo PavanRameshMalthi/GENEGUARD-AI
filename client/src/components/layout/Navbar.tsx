@@ -4,6 +4,7 @@ import { Shield, Menu, X, User, Settings as SettingsIcon, LogOut } from 'lucide-
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
 import ThemeToggle from '@/components/ui/ThemeToggle';
+import NotificationDropdown from '@/components/features/NotificationDropdown';
 
 const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
@@ -28,6 +29,7 @@ const Navbar: React.FC = () => {
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
+            {user && <NotificationDropdown />}
             <ThemeToggle />
             
             {user ? (

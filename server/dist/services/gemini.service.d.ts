@@ -57,6 +57,11 @@ export declare const generateSmartClinicalAnalysis: (data: any) => {
 };
 export declare const analyzeHealth: (assessmentData: any) => Promise<any>;
 export declare const chatResponse: (messages: any[], userMessage: string) => Promise<string>;
-export declare const analyzeReport: (fileName: string, fileType: string) => Promise<string>;
+import { IStructuredReportAnalysis } from '../models/Report.js';
+export declare const analyzeMedicalReport: (fileName: string, fileType: string, filePath?: string) => Promise<{
+    summary: string;
+    structuredAnalysis: IStructuredReportAnalysis;
+}>;
+export declare const analyzeReport: (fileName: string, fileType: string, filePath?: string) => Promise<string>;
 export declare const generateRecommendations: (assessmentData: any) => Promise<any>;
 export declare const generateWeeklyGoals: (assessmentData: any) => Promise<any>;

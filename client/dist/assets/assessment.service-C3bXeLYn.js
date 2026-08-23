@@ -1,1 +1,0 @@
-import{e}from"./index-DZqDRh-b.js";const n={createAssessment:async s=>(await e.post("/assessments",s)).data,getAssessments:async()=>(await e.get("/assessments")).data,getLatestAssessment:async()=>(await e.get("/assessments/latest")).data,getAssessment:async s=>(await e.get(`/assessments/${s}`)).data};export{n as a};

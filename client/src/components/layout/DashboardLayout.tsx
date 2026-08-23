@@ -2,6 +2,7 @@ import React from 'react';
 import { Menu } from 'lucide-react';
 import Sidebar from './Sidebar';
 import ThemeToggle from '@/components/ui/ThemeToggle';
+import NotificationDropdown from '@/components/features/NotificationDropdown';
 import { useAuth } from '@/hooks/useAuth';
 import { useSidebar } from '@/context/SidebarContext';
 
@@ -37,7 +38,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title = 'Da
             </h1>
           </div>
           
-          <div className="flex items-center gap-3.5">
+          <div className="flex items-center gap-3">
+            <NotificationDropdown />
             <ThemeToggle />
             <div 
               title={user?.name || 'User'}

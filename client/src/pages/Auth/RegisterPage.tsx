@@ -35,9 +35,13 @@ export default function RegisterPage() {
     try {
       const sanitizedName = sanitizeText(data.name);
       const sanitizedEmail = sanitizeText(data.email).toLowerCase();
-      await registerAuth({ name: sanitizedName, email: sanitizedEmail, password: data.password });
+      const newUser = await registerAuth({ name: sanitizedName, email: sanitizedEmail, password: data.password });
       success('Account created successfully!');
-      navigate('/dashboard');
+      if (newUser?.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err: any) {
       const message = err.response?.data?.message || err.response?.data?.errors?.[0]?.msg || err.message || 'Registration failed';
       showError(message);
