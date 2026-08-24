@@ -179,7 +179,3 @@ geneguard-ai/
 - **Animations**: Framer Motion page transitions and micro-interactions
 
 ---
-
-## 📄 License
-
-MIT
