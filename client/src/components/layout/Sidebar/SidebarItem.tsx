@@ -39,27 +39,18 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
         onClick={onClick}
         aria-label={label}
         aria-current={isActive ? 'page' : undefined}
-        className={`group relative flex items-center rounded-xl transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
-          isCollapsed ? 'justify-center w-11 h-11 mx-auto p-0' : 'px-3.5 py-2.5 w-full gap-3'
+        className={`group relative flex items-center rounded-xl transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+          isCollapsed ? 'justify-center w-11 h-11 mx-auto p-0' : 'px-3.5 py-2.5 w-full gap-3 h-11'
         } ${
           isActive
-            ? 'bg-primary-600 dark:bg-primary-500 text-white font-semibold shadow-lg shadow-primary-500/25'
-            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100/80 dark:hover:bg-gray-800/80 hover:text-gray-900 dark:hover:text-gray-100'
+            ? 'bg-indigo-600 text-white font-semibold shadow-md shadow-indigo-500/25'
+            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white'
         }`}
       >
-        {/* Active Pill indicator on left for expanded mode */}
-        {isActive && !isCollapsed && (
-          <motion.div
-            layoutId="activeIndicator"
-            className="absolute left-0 top-1.5 bottom-1.5 w-1 rounded-r-full bg-white"
-            transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-          />
-        )}
-
         {/* Icon */}
         <Icon
-          className={`h-5 w-5 shrink-0 transition-transform duration-200 group-hover:scale-110 ${
-            isActive ? 'text-white' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-100'
+          className={`h-5 w-5 shrink-0 transition-transform duration-200 group-hover:scale-105 ${
+            isActive ? 'text-white' : 'text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white'
           }`}
         />
 

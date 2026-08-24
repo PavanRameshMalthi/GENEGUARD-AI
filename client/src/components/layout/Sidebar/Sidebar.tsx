@@ -42,19 +42,17 @@ export const Sidebar: React.FC = () => {
 
   const navItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
-    { icon: Bot, label: 'AI Health Copilot', path: '/copilot', badge: 'AI', badgeColor: 'bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300' },
-    { icon: Calendar, label: 'Health Calendar', path: '/calendar' },
-    { icon: Dna, label: 'Family Lineage', path: '/family' },
-    { icon: Trophy, label: 'Achievements', path: '/achievements' },
-    { icon: Activity, label: 'Daily Tracking', path: '/tracking' },
-    { icon: History, label: 'Health Timeline', path: '/timeline' },
+    { icon: ClipboardList, label: 'Health Assessment', path: '/assessment' },
+    { icon: Activity, label: 'Log Today\'s Health', path: '/tracking' },
     { icon: Target, label: 'Health Goals', path: '/goals' },
+    { icon: History, label: 'Health Timeline', path: '/timeline' },
     { icon: FileText, label: 'Medical Reports', path: '/reports' },
-    { icon: FileBarChart, label: 'Weekly Reports', path: '/weekly-reports' },
-    { icon: ClipboardList, label: 'Assessment', path: '/assessment' },
+    { icon: Bot, label: 'AI Health Coach', path: '/copilot', badge: 'AI', badgeColor: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300' },
+    { icon: FileBarChart, label: 'Weekly Report', path: '/weekly-reports' },
+    { icon: Calendar, label: 'Preventive Calendar', path: '/calendar' },
+    { icon: Dna, label: 'Family Factors', path: '/family' },
+    { icon: Trophy, label: 'Achievements', path: '/achievements' },
     { icon: MessageSquare, label: 'AI Chat', path: '/chat', badge: 'AI' },
-    { icon: Heart, label: 'Recommendations', path: '/recommendations' },
-    { icon: User, label: 'Profile', path: '/profile' },
     { icon: Settings, label: 'Settings', path: '/settings' },
   ];
 
@@ -63,7 +61,7 @@ export const Sidebar: React.FC = () => {
   ];
 
   const renderNavList = (isMobile = false) => (
-    <div className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-3 space-y-4 custom-scrollbar">
+    <div className="flex-1 overflow-y-auto overflow-x-hidden px-2.5 py-3 space-y-3 custom-scrollbar">
       {/* Main Section */}
       <div>
         <AnimatePresence>
@@ -73,13 +71,13 @@ export const Sidebar: React.FC = () => {
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.15 }}
-              className="px-3.5 text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1.5"
+              className="px-3 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5"
             >
-              Main Menu
+              Main Navigation
             </motion.p>
           )}
         </AnimatePresence>
-        <div className="space-y-1">
+        <div className="space-y-0.5">
           {navItems.map((item) => (
             <SidebarItem
               key={item.path}
@@ -97,7 +95,7 @@ export const Sidebar: React.FC = () => {
 
       {/* Admin Section (if admin) */}
       {user?.role === 'admin' && (
-        <div className="pt-2 border-t border-gray-200/60 dark:border-gray-800/60">
+        <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800/60">
           <AnimatePresence>
             {(!isCollapsed || isMobile) && (
               <motion.p
@@ -105,13 +103,13 @@ export const Sidebar: React.FC = () => {
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.15 }}
-                className="px-3.5 text-[11px] font-bold text-purple-500 dark:text-purple-400 uppercase tracking-wider mb-1.5"
+                className="px-3 text-[10px] font-bold text-purple-500 dark:text-purple-400 uppercase tracking-widest mb-1.5"
               >
-                Administration
+                Admin Management
               </motion.p>
             )}
           </AnimatePresence>
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             {adminItems.map((item) => (
               <SidebarItem
                 key={item.path}
@@ -137,13 +135,13 @@ export const Sidebar: React.FC = () => {
         aria-label="Sidebar Navigation"
         initial={false}
         animate={{
-          width: isCollapsed ? 80 : 280,
+          width: isCollapsed ? 76 : 256,
         }}
         transition={{
-          duration: 0.28,
+          duration: 0.25,
           ease: [0.4, 0, 0.2, 1]
         }}
-        className="hidden md:flex flex-col shrink-0 h-screen sticky top-0 z-30 bg-white/85 dark:bg-gray-900/85 backdrop-blur-xl border-r border-gray-200/80 dark:border-gray-800/80 shadow-sm transition-colors"
+        className="hidden lg:flex flex-col shrink-0 min-h-full bg-white/95 dark:bg-[#090d1f]/95 backdrop-blur-xl border-r border-slate-200/80 dark:border-slate-800/80 shadow-sm transition-colors relative z-10"
       >
         <SidebarHeader
           isCollapsed={isCollapsed}
@@ -166,7 +164,7 @@ export const Sidebar: React.FC = () => {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
               onClick={closeMobile}
-              className="fixed inset-0 z-50 bg-gray-900/60 backdrop-blur-sm md:hidden"
+              className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm lg:hidden"
               aria-hidden="true"
             />
 
@@ -176,8 +174,8 @@ export const Sidebar: React.FC = () => {
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
-              transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
-              className="fixed inset-y-0 left-0 z-50 w-72 flex flex-col bg-white dark:bg-gray-900 shadow-2xl border-r border-gray-200 dark:border-gray-800 md:hidden"
+              transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+              className="fixed inset-y-0 left-0 z-50 w-72 flex flex-col bg-white dark:bg-[#090d1f] shadow-2xl border-r border-slate-200 dark:border-slate-800 lg:hidden"
             >
               <SidebarHeader
                 isCollapsed={false}

@@ -8,6 +8,7 @@ interface ProgressBarProps {
   size?: 'sm' | 'md' | 'lg';
   animated?: boolean;
   label?: string;
+  className?: string;
 }
 
 const colorMap: Record<string, string> = {
@@ -25,6 +26,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   size = 'md',
   animated = true,
   label,
+  className = '',
 }) => {
   const actualValue = Math.min(100, Math.max(0, value !== undefined ? value : (progress !== undefined ? progress : 0)));
 
@@ -41,7 +43,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
     : undefined;
 
   return (
-    <div className="w-full">
+    <div className={`w-full ${className}`}>
       {label && (
         <div className="flex justify-between mb-1">
           <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{label}</span>
