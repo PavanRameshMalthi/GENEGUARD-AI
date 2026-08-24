@@ -16,7 +16,7 @@ export interface IUser extends mongoose.Document {
     familyHistory?: string[];
   };
   settings?: {
-    theme?: 'light' | 'dark' | 'system';
+    theme?: 'light' | 'dark';
     notifications?: boolean;
     language?: string;
     privacy?: {
@@ -79,7 +79,7 @@ const userSchema = new mongoose.Schema({
     familyHistory: [{ type: String, trim: true }]
   },
   settings: {
-    theme: { type: String, enum: ['light', 'dark', 'system'], default: 'system' },
+    theme: { type: String, enum: ['light', 'dark'], default: 'light' },
     notifications: { type: Boolean, default: true },
     language: { type: String, default: 'en' },
     privacy: {

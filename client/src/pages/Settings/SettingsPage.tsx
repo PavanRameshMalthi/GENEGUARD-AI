@@ -9,7 +9,6 @@ import { userService } from '@/services/user.service';
 import { 
   Moon, 
   Sun, 
-  Monitor, 
   Download, 
   FileSpreadsheet, 
   FileJson, 
@@ -128,36 +127,30 @@ export default function SettingsPage() {
 
         {/* Appearance */}
         <Card glass title="Interface Appearance" className="p-6">
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 gap-4 max-w-md">
             <button
+              type="button"
               onClick={() => setTheme('light')}
-              className={`p-4 border rounded-2xl flex flex-col items-center gap-2 transition-all ${
+              className={`p-4 border rounded-2xl flex flex-col items-center gap-2 transition-all cursor-pointer ${
                 theme === 'light'
-                  ? 'border-primary-500 bg-primary-50 dark:bg-primary-950/40 text-primary-600 font-bold'
-                  : 'border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-300'
+                  ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 font-bold shadow-sm'
+                  : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
               }`}
             >
-              <Sun size={24} /> Light
+              <Sun size={24} className={theme === 'light' ? 'text-amber-500' : 'text-slate-400'} />
+              <span>Light Mode</span>
             </button>
             <button
+              type="button"
               onClick={() => setTheme('dark')}
-              className={`p-4 border rounded-2xl flex flex-col items-center gap-2 transition-all ${
+              className={`p-4 border rounded-2xl flex flex-col items-center gap-2 transition-all cursor-pointer ${
                 theme === 'dark'
-                  ? 'border-primary-500 bg-primary-50 dark:bg-primary-950/40 text-primary-600 font-bold'
-                  : 'border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-300'
+                  ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 font-bold shadow-sm'
+                  : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
               }`}
             >
-              <Moon size={24} /> Dark
-            </button>
-            <button
-              onClick={() => setTheme('system')}
-              className={`p-4 border rounded-2xl flex flex-col items-center gap-2 transition-all ${
-                theme === 'system'
-                  ? 'border-primary-500 bg-primary-50 dark:bg-primary-950/40 text-primary-600 font-bold'
-                  : 'border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-300'
-              }`}
-            >
-              <Monitor size={24} /> System
+              <Moon size={24} className={theme === 'dark' ? 'text-indigo-400' : 'text-slate-400'} />
+              <span>Dark Mode</span>
             </button>
           </div>
         </Card>

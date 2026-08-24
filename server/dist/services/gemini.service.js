@@ -1,8 +1,9 @@
 import { getGeminiClient, hasGeminiConfigured } from '../config/gemini.js';
-const DISCLAIMER = 'GeneGuard AI provides educational wellness insights only. It is not a medical diagnosis. Always consult a qualified healthcare professional.';
+import fs from 'fs';
+import { checkAISafety, CLINICAL_DISCLAIMER, enforceDisclaimer } from '../utils/ai-safety.js';
 const SYSTEM_PROMPT = `You are GeneGuard AI, an advanced preventive healthcare assistant. Important: You are NOT a medical diagnosis tool.
 Analyze the provided health data and provide personalized, actionable preventive wellness advice.
-Always end your text responses with: "${DISCLAIMER}"`;
+Always end your text responses with: "${CLINICAL_DISCLAIMER}"`;
 // Helper: Smart Clinical Fallback Analysis Engine
 export const generateSmartClinicalAnalysis = (data) => {
     const calculations = data.calculations || {};
@@ -199,7 +200,6 @@ export const generateSmartClinicalAnalysis = (data) => {
     };
 };
 export const analyzeHealth = async (assessmentData) => {
-    // Check if Gemini is configured
     if (!hasGeminiConfigured()) {
         return generateSmartClinicalAnalysis(assessmentData);
     }
@@ -238,7 +238,6 @@ export const analyzeHealth = async (assessmentData) => {
   "whenToVisitDoctor": "string"
 }
 \nAssessment Data: ${JSON.stringify(assessmentData)}`;
-    // Try calling Gemini API with automatic retry
     for (let attempt = 1; attempt <= 2; attempt++) {
         try {
             const model = client.getGenerativeModel({ model: 'gemini-2.0-flash' });
@@ -260,8 +259,6 @@ export const analyzeHealth = async (assessmentData) => {
         catch (error) {
             console.warn(`[Gemini] Health Analysis Attempt ${attempt} failed:`, error?.message || error);
             if (attempt === 2) {
-                // Fallback gracefully on 2nd failure
-                console.log('[Gemini] Activating Smart Clinical Analysis fallback engine');
                 return generateSmartClinicalAnalysis(assessmentData);
             }
         }
@@ -269,6 +266,11 @@ export const analyzeHealth = async (assessmentData) => {
     return generateSmartClinicalAnalysis(assessmentData);
 };
 export const chatResponse = async (messages, userMessage) => {
+    // Safety guard check
+    const safety = checkAISafety(userMessage);
+    if (safety.isEmergency && safety.safeAdvice) {
+        return safety.safeAdvice;
+    }
     if (!hasGeminiConfigured()) {
         return generateFallbackChatResponse(userMessage);
     }
@@ -292,10 +294,7 @@ export const chatResponse = async (messages, userMessage) => {
             const prompt = `${SYSTEM_PROMPT}\nUser: ${userMessage}`;
             const result = await chat.sendMessage(prompt);
             let text = result.response.text();
-            if (!text.includes(DISCLAIMER)) {
-                text += `\n\n${DISCLAIMER}`;
-            }
-            return text;
+            return enforceDisclaimer(text);
         }
         catch (error) {
             console.warn(`[Gemini] Chat Attempt ${attempt} failed:`, error?.message || error);
@@ -327,9 +326,8 @@ const generateFallbackChatResponse = (userMessage) => {
     else {
         advice = `Thank you for reaching out regarding "${userMessage}". For optimal preventive health, prioritize consistent daily movement, whole-food nutrition, adequate hydration, and 7-8 hours of restful sleep. If you have specific medical symptoms or persistent conditions, consult your doctor.`;
     }
-    return `${advice}\n\n${DISCLAIMER}`;
+    return enforceDisclaimer(advice);
 };
-import fs from 'fs';
 export const analyzeMedicalReport = async (fileName, fileType, filePath) => {
     const defaultFallback = {
         summary: `Report "${fileName}" has been recorded. This educational overview outlines potential markers to review with a qualified healthcare professional.`,
@@ -346,20 +344,19 @@ export const analyzeMedicalReport = async (fileName, fileType, filePath) => {
     };
     if (!hasGeminiConfigured()) {
         return {
-            summary: defaultFallback.summary + `\n\n${DISCLAIMER}`,
+            summary: enforceDisclaimer(defaultFallback.summary),
             structuredAnalysis: defaultFallback
         };
     }
     const client = getGeminiClient();
     if (!client) {
         return {
-            summary: defaultFallback.summary + `\n\n${DISCLAIMER}`,
+            summary: enforceDisclaimer(defaultFallback.summary),
             structuredAnalysis: defaultFallback
         };
     }
     try {
         const model = client.getGenerativeModel({ model: 'gemini-2.0-flash' });
-        // Prepare prompt with strict safety instructions
         const promptText = `You are GeneGuard AI, an educational preventive healthcare assistant. 
 CRITICAL MEDICAL SAFETY RULES:
 1. You are NOT diagnosing any disease or medical condition.
@@ -381,7 +378,6 @@ Return a clean, valid JSON object matching this schema exactly without markdown 
   "importantDates": ["Date mentioned in report or date of review"]
 }`;
         const parts = [{ text: promptText }];
-        // If file exists and is image or PDF, attach as inline data if readable
         if (filePath && fs.existsSync(filePath)) {
             try {
                 const fileBuffer = fs.readFileSync(filePath);
@@ -418,16 +414,13 @@ Return a clean, valid JSON object matching this schema exactly without markdown 
             recommendedFollowUp: Array.isArray(parsed.recommendedFollowUp) ? parsed.recommendedFollowUp : defaultFallback.recommendedFollowUp,
             importantDates: Array.isArray(parsed.importantDates) ? parsed.importantDates : defaultFallback.importantDates
         };
-        let summary = structuredAnalysis.summary;
-        if (!summary.includes(DISCLAIMER)) {
-            summary += `\n\nThis AI-generated summary is for educational purposes only and is not a medical diagnosis. Always discuss lab results with a qualified healthcare professional.`;
-        }
+        let summary = enforceDisclaimer(structuredAnalysis.summary);
         return { summary, structuredAnalysis };
     }
     catch (error) {
         console.error('Gemini structured report analysis error:', error);
         return {
-            summary: defaultFallback.summary + `\n\n${DISCLAIMER}`,
+            summary: enforceDisclaimer(defaultFallback.summary),
             structuredAnalysis: defaultFallback
         };
     }
@@ -435,6 +428,290 @@ Return a clean, valid JSON object matching this schema exactly without markdown 
 export const analyzeReport = async (fileName, fileType, filePath) => {
     const result = await analyzeMedicalReport(fileName, fileType, filePath);
     return result.summary;
+};
+export const generateCopilotResponse = async (context, userMessage, chatHistory = []) => {
+    const safety = checkAISafety(userMessage);
+    if (safety.isEmergency) {
+        return {
+            text: safety.safeAdvice || safety.emergencyMessage || 'Immediate medical attention advised.',
+            safety,
+            suggestedActions: ['Call Emergency Services (911/112)', 'Go to Nearest Emergency Room', 'Contact Primary Physician'],
+            category: 'emergency'
+        };
+    }
+    const contextSummary = JSON.stringify({
+        userProfile: {
+            age: context.profile?.age,
+            gender: context.profile?.gender,
+            bloodGroup: context.profile?.bloodGroup
+        },
+        latestAssessment: context.latestAssessment ? {
+            healthScore: context.latestAssessment.calculations?.healthScore,
+            bmi: context.latestAssessment.calculations?.bmi,
+            riskLevel: context.latestAssessment.calculations?.riskLevel,
+            riskFactors: context.latestAssessment.aiAnalysis?.riskFactors
+        } : null,
+        recentTrackingLast7Days: (context.recentTracking || []).slice(0, 7).map(t => ({
+            date: t.date,
+            waterConsumed: t.hydration?.waterConsumed,
+            totalSleep: t.sleep?.totalSleep,
+            steps: t.physicalActivity?.steps,
+            mood: t.wellness?.mood,
+            stressLevel: t.wellness?.stressLevel
+        })),
+        activeGoals: (context.activeGoals || []).map(g => ({
+            title: g.title,
+            progress: `${g.current}/${g.target} ${g.unit}`,
+            status: g.status
+        })),
+        recentReports: (context.recentReports || []).map(r => ({
+            fileName: r.fileName,
+            reportType: r.reportType,
+            abnormalValues: r.structuredAnalysis?.abnormalValues
+        })),
+        familyRisks: (context.familyHistory || []).map(f => ({
+            relation: f.relation,
+            conditions: f.conditions
+        }))
+    });
+    const prompt = `${SYSTEM_PROMPT}
+You are the AI Health Copilot for GeneGuard AI. You have access to this user's holistic health profile:
+${contextSummary}
+
+Respond to the user with actionable, context-aware preventive guidance.
+Suggest 3 concise follow-up actions they can take in the application.
+
+User Question/Prompt: "${userMessage}"
+
+Provide response as JSON:
+{
+  "text": "Detailed clinical wellness advice...",
+  "suggestedActions": ["Action 1", "Action 2", "Action 3"],
+  "category": "lifestyle" | "nutrition" | "activity" | "sleep" | "medical_review" | "goals"
+}`;
+    if (hasGeminiConfigured()) {
+        const client = getGeminiClient();
+        if (client) {
+            try {
+                const model = client.getGenerativeModel({ model: 'gemini-2.0-flash' });
+                const result = await model.generateContent({
+                    contents: [{ role: 'user', parts: [{ text: prompt }] }],
+                    generationConfig: { temperature: 0.5, responseMimeType: 'application/json' }
+                });
+                const parsed = JSON.parse(result.response.text().trim());
+                return {
+                    text: enforceDisclaimer(parsed.text),
+                    safety,
+                    suggestedActions: parsed.suggestedActions || ['Log today metrics', 'Review active goals', 'Check preventive calendar'],
+                    category: parsed.category || 'lifestyle'
+                };
+            }
+            catch (err) {
+                console.warn('[Gemini Copilot Error]:', err);
+            }
+        }
+    }
+    // Smart Clinical Fallback for Copilot
+    let fallbackText = `Based on your health footprint, maintaining consistency in hydration, 7-8 hours sleep, and progressive daily movement provides the strongest protective baseline. `;
+    if (context.latestAssessment?.calculations?.healthScore) {
+        fallbackText += `Your current preventive health score is ${context.latestAssessment.calculations.healthScore}/100. `;
+    }
+    if (userMessage.toLowerCase().includes('water') || userMessage.toLowerCase().includes('hydration')) {
+        fallbackText += `Your logged hydration average shows opportunities to meet your daily target earlier in the day.`;
+    }
+    else if (userMessage.toLowerCase().includes('sleep') || userMessage.toLowerCase().includes('tired')) {
+        fallbackText += `Anchoring a strict wake-up time and avoiding screens 1 hour prior to sleep will restore deep sleep phases.`;
+    }
+    else {
+        fallbackText += `Continue tracking your daily biometrics and review any abnormal laboratory markers with your physician.`;
+    }
+    return {
+        text: enforceDisclaimer(fallbackText),
+        safety,
+        suggestedActions: ['Log today\'s metrics', 'Check preventive calendar', 'Review family risk factors'],
+        category: 'lifestyle'
+    };
+};
+export const compareMedicalReports = async (report1, report2) => {
+    const fallbackResult = {
+        report1: { id: report1.id, name: report1.fileName, date: report1.date },
+        report2: { id: report2.id, name: report2.fileName, date: report2.date },
+        overallComparisonSummary: `Comparison between "${report1.fileName}" (${new Date(report1.date).toLocaleDateString()}) and "${report2.fileName}" (${new Date(report2.date).toLocaleDateString()}). Tracking longitudinal trends assists your physician in assessing cardiovascular, metabolic, and systemic health evolution.`,
+        deltas: [
+            {
+                metric: 'General Finding Alignment',
+                previousValue: report1.structuredAnalysis?.abnormalValues?.join('; ') || 'Standard reference baseline',
+                currentValue: report2.structuredAnalysis?.abnormalValues?.join('; ') || 'Follow-up markers evaluated',
+                changeValue: 'Temporal interval recorded',
+                status: 'neutral',
+                clinicalContext: 'Review the delta across laboratory testing dates with your healthcare provider.'
+            }
+        ],
+        improvements: ['Consistent longitudinal tracking of laboratory records established.'],
+        concerns: ['Ensure regular follow-up with your primary physician to evaluate shifting biomarkers.'],
+        questionsForDoctor: [
+            'How do the changes between these two diagnostic dates impact my long-term treatment plan?',
+            'Are there specific lifestyle or dietary adjustments recommended based on these trends?'
+        ],
+        recommendedActions: [
+            'Maintain an active log of physical activity and dietary intake.',
+            'Bring both diagnostic reports to your next clinical appointment.'
+        ]
+    };
+    if (!hasGeminiConfigured()) {
+        return fallbackResult;
+    }
+    const client = getGeminiClient();
+    if (!client)
+        return fallbackResult;
+    const prompt = `${SYSTEM_PROMPT}
+You are an expert clinical pathologist and preventive healthcare data analyst.
+Compare the following two medical reports chronologically:
+Report 1 (Earlier: ${report1.date}): ${JSON.stringify(report1)}
+Report 2 (Later: ${report2.date}): ${JSON.stringify(report2)}
+
+Extract any biomarkers found in both or either reports (e.g. Glucose, Total Cholesterol, HDL, LDL, Triglycerides, HbA1c, BP, Hemoglobin, WBC, ALT/AST, TSH, etc.) and calculate deltas.
+
+Return a clean JSON object matching this schema exactly:
+{
+  "overallComparisonSummary": "Comprehensive summary of progress and changes between the two reports",
+  "deltas": [
+    {
+      "metric": "e.g. Fasting Blood Glucose",
+      "previousValue": "e.g. 115 mg/dL",
+      "currentValue": "e.g. 98 mg/dL",
+      "changeValue": "-17 mg/dL (-14.8%)",
+      "status": "improved" | "stable" | "deteriorated" | "neutral",
+      "clinicalContext": "Educational explanation of what this change indicates"
+    }
+  ],
+  "improvements": ["Positive biomarker change 1", "Positive change 2"],
+  "concerns": ["Area requiring monitoring 1"],
+  "questionsForDoctor": ["Question 1 to ask physician", "Question 2"],
+  "recommendedActions": ["Preventive step 1", "Preventive step 2"]
+}`;
+    try {
+        const model = client.getGenerativeModel({ model: 'gemini-2.0-flash' });
+        const result = await model.generateContent({
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            generationConfig: { temperature: 0.3, responseMimeType: 'application/json' }
+        });
+        const parsed = JSON.parse(result.response.text().trim());
+        return {
+            report1: { id: report1.id, name: report1.fileName, date: report1.date },
+            report2: { id: report2.id, name: report2.fileName, date: report2.date },
+            overallComparisonSummary: enforceDisclaimer(parsed.overallComparisonSummary || fallbackResult.overallComparisonSummary),
+            deltas: Array.isArray(parsed.deltas) && parsed.deltas.length > 0 ? parsed.deltas : fallbackResult.deltas,
+            improvements: Array.isArray(parsed.improvements) ? parsed.improvements : fallbackResult.improvements,
+            concerns: Array.isArray(parsed.concerns) ? parsed.concerns : fallbackResult.concerns,
+            questionsForDoctor: Array.isArray(parsed.questionsForDoctor) ? parsed.questionsForDoctor : fallbackResult.questionsForDoctor,
+            recommendedActions: Array.isArray(parsed.recommendedActions) ? parsed.recommendedActions : fallbackResult.recommendedActions
+        };
+    }
+    catch (err) {
+        console.error('Report comparison AI error:', err);
+        return fallbackResult;
+    }
+};
+export const analyzeFamilyHereditaryRisk = async (familyMembers, userProfile) => {
+    const defaultFallback = {
+        overallRiskScore: 45,
+        riskCategory: 'Moderate',
+        summary: 'Based on your recorded familial lineage, targeted lifestyle modifications and periodic preventive screenings can effectively mitigate inherited risk factors.',
+        conditionPredispositions: [
+            {
+                condition: 'Cardiovascular Vulnerability (CAD / Hypertension)',
+                riskScore: 50,
+                riskLevel: 'Moderate',
+                affectedRelatives: ['Father', 'Paternal Grandfather'],
+                geneticWeight: '1st & 2nd Degree',
+                preventiveGuidelines: [
+                    'Maintain aerobic physical activity 150+ minutes per week.',
+                    'Adopt the Mediterranean or DASH dietary pattern rich in omega-3s.'
+                ],
+                screeningBenchmarks: 'Annual lipid panel and resting blood pressure monitoring.'
+            },
+            {
+                condition: 'Type 2 Diabetes / Metabolic Syndrome',
+                riskScore: 40,
+                riskLevel: 'Moderate',
+                affectedRelatives: ['Mother'],
+                geneticWeight: '1st Degree',
+                preventiveGuidelines: [
+                    'Limit ultra-processed carbohydrates and high glycemic load foods.',
+                    'Prioritize lean protein and 30g+ daily dietary fiber.'
+                ],
+                screeningBenchmarks: 'Fasting glucose and HbA1c screening every 12 months.'
+            }
+        ],
+        preventiveActionPlan: [
+            'Schedule annual comprehensive blood panels with your primary care provider.',
+            'Maintain an active daily movement regimen of 8,000+ steps.',
+            'Keep your clinical family tree updated as new health history becomes known.'
+        ],
+        recommendedGeneticConsultation: false
+    };
+    if (!familyMembers || familyMembers.length === 0) {
+        return defaultFallback;
+    }
+    if (!hasGeminiConfigured()) {
+        return defaultFallback;
+    }
+    const client = getGeminiClient();
+    if (!client)
+        return defaultFallback;
+    const prompt = `${SYSTEM_PROMPT}
+You are an expert in Medical Genetics and Preventive Epidemiology.
+Analyze the following user profile and family medical history to evaluate hereditary disease predispositions:
+User Profile: ${JSON.stringify(userProfile)}
+Family Tree Relatives and Conditions: ${JSON.stringify(familyMembers)}
+
+Rules:
+1. 1st degree relatives (Father, Mother, Full Siblings, Children) share ~50% genetic DNA and carry highest risk weight.
+2. 2nd degree relatives (Grandparents, Half-siblings, Aunts/Uncles) share ~25% DNA.
+3. Early age of onset (<55 for men, <65 for women) signifies stronger hereditary penetrance.
+
+Return a clean JSON object matching this schema:
+{
+  "overallRiskScore": number (0-100),
+  "riskCategory": "Low" | "Moderate" | "High",
+  "summary": "Educational summary of inherited risks and positive protective factors",
+  "conditionPredispositions": [
+    {
+      "condition": "Condition name",
+      "riskScore": number (0-100),
+      "riskLevel": "Low" | "Moderate" | "High" | "Very High",
+      "affectedRelatives": ["Relative name/relation"],
+      "geneticWeight": "1st Degree" | "2nd Degree" | "Compound Multigenerational",
+      "preventiveGuidelines": ["Guideline 1", "Guideline 2"],
+      "screeningBenchmarks": "Recommended age and screening frequency"
+    }
+  ],
+  "preventiveActionPlan": ["Action 1", "Action 2", "Action 3"],
+  "recommendedGeneticConsultation": boolean
+}`;
+    try {
+        const model = client.getGenerativeModel({ model: 'gemini-2.0-flash' });
+        const result = await model.generateContent({
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            generationConfig: { temperature: 0.4, responseMimeType: 'application/json' }
+        });
+        const parsed = JSON.parse(result.response.text().trim());
+        return {
+            overallRiskScore: typeof parsed.overallRiskScore === 'number' ? parsed.overallRiskScore : defaultFallback.overallRiskScore,
+            riskCategory: parsed.riskCategory || defaultFallback.riskCategory,
+            summary: enforceDisclaimer(parsed.summary || defaultFallback.summary),
+            conditionPredispositions: Array.isArray(parsed.conditionPredispositions) && parsed.conditionPredispositions.length > 0
+                ? parsed.conditionPredispositions
+                : defaultFallback.conditionPredispositions,
+            preventiveActionPlan: Array.isArray(parsed.preventiveActionPlan) ? parsed.preventiveActionPlan : defaultFallback.preventiveActionPlan,
+            recommendedGeneticConsultation: Boolean(parsed.recommendedGeneticConsultation)
+        };
+    }
+    catch (err) {
+        console.error('Family hereditary risk AI error:', err);
+        return defaultFallback;
+    }
 };
 export const generateRecommendations = async (assessmentData) => {
     if (!assessmentData) {

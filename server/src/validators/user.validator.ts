@@ -51,7 +51,7 @@ export const updatePasswordValidator = [
 export const updateSettingsValidator = [
   body('theme')
     .optional()
-    .isIn(['light', 'dark', 'system']).withMessage('Theme must be light, dark, or system'),
+    .isIn(['light', 'dark']).withMessage('Theme must be light or dark'),
 
   body('notifications')
     .optional()

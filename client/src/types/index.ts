@@ -20,7 +20,7 @@ export interface UserProfile {
 }
 
 export interface UserSettings {
-  theme: 'light' | 'dark' | 'system';
+  theme: 'light' | 'dark';
   notifications: boolean;
   language: string;
   privacy: {
@@ -88,7 +88,7 @@ export interface AdminStats {
   timestamp?: string;
 }
 
-export type Theme = 'light' | 'dark' | 'system';
+export type Theme = 'light' | 'dark';
 
 export interface ToastMessage {
   id: string;

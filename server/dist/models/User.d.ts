@@ -14,7 +14,7 @@ export interface IUser extends mongoose.Document {
         familyHistory?: string[];
     };
     settings?: {
-        theme?: 'light' | 'dark' | 'system';
+        theme?: 'light' | 'dark';
         notifications?: boolean;
         language?: string;
         privacy?: {
@@ -22,6 +22,8 @@ export interface IUser extends mongoose.Document {
             analytics?: boolean;
         };
     };
+    createdAt?: Date;
+    updatedAt?: Date;
     comparePassword(candidatePassword: string): Promise<boolean>;
 }
 export declare const User: mongoose.Model<IUser, {}, {}, {}, mongoose.Document<unknown, {}, IUser, {}, {}> & IUser & Required<{

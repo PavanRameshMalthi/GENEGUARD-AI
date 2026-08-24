@@ -24,6 +24,10 @@ import timelineRoutes from './routes/timeline.routes.js';
 import notificationRoutes from './routes/notification.routes.js';
 import weeklyReportRoutes from './routes/weekly-report.routes.js';
 import scoreRoutes from './routes/score.routes.js';
+import calendarRoutes from './routes/calendar.routes.js';
+import familyRoutes from './routes/family.routes.js';
+import achievementRoutes from './routes/achievement.routes.js';
+import copilotRoutes from './routes/copilot.routes.js';
 const app = express();
 // Connect to MongoDB and synchronize admin account security
 connectDB().then(() => {
@@ -58,6 +62,10 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/reports/weekly', weeklyReportRoutes);
 app.use('/api/weekly-reports', weeklyReportRoutes);
 app.use('/api/health/score', scoreRoutes);
+app.use('/api/calendar', calendarRoutes);
+app.use('/api/family', familyRoutes);
+app.use('/api/achievements', achievementRoutes);
+app.use('/api/copilot', copilotRoutes);
 app.use(errorHandler);
 const PORT = ENV.PORT || 5000;
 app.listen(PORT, () => {
