@@ -39,12 +39,13 @@ export const register = async (req, res) => {
     }
 };
 export const login = async (req, res) => {
+    let normalizedEmail = '';
     try {
         const { email, password } = req.body;
         if (!email || !password) {
             return res.status(400).json(formatResponse(false, null, 'Email and password are required'));
         }
-        const normalizedEmail = email.toLowerCase().trim();
+        normalizedEmail = email.toLowerCase().trim();
         const user = await User.findOne({ email: normalizedEmail });
         if (user && (await user.comparePassword(password))) {
             // Re-verify designated admin role upon successful login
@@ -56,6 +57,7 @@ export const login = async (req, res) => {
                 user.role = 'user';
                 await user.save();
             }
+            console.log(`[AUTH LOGIN ATTEMPT] email: ${normalizedEmail} | status: 200 | result: success`);
             const token = generateToken(user._id.toString());
             res.json(formatResponse(true, {
                 token,
@@ -63,10 +65,12 @@ export const login = async (req, res) => {
             }));
         }
         else {
+            console.log(`[AUTH LOGIN ATTEMPT] email: ${normalizedEmail} | status: 401 | result: failure`);
             res.status(401).json(formatResponse(false, null, 'Invalid email or password'));
         }
     }
     catch (error) {
+        console.error(`[AUTH LOGIN ERROR] email: ${normalizedEmail || 'unknown'} | error: ${error.message}`);
         res.status(500).json(formatResponse(false, null, error.message));
     }
 };

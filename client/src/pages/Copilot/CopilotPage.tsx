@@ -1,28 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
-import DashboardLayout from '@/components/layout/DashboardLayout';
-import Card from '@/components/ui/Card';
-import Button from '@/components/ui/Button';
-import DisclaimerBanner from '@/components/features/DisclaimerBanner';
-import EmergencyAlertModal from '@/components/features/EmergencyAlertModal';
-import LoadingSkeleton from '@/components/ui/LoadingSkeleton';
-import { copilotService } from '@/services/copilot.service';
-import { CopilotContextSummary } from '@/types';
-import { useToast } from '@/hooks/useToast';
+import { useSearchParams } from 'react-router-dom';
 import { 
   Bot, 
   Sparkles, 
   Send, 
-  Activity, 
-  Target, 
-  FileText, 
-  Users, 
-  ShieldAlert, 
-  ArrowRight,
+  Paperclip,
   RotateCcw,
-  CheckCircle2,
-  AlertTriangle
+  Copy,
+  Check,
+  Dna
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import DashboardLayout from '@/components/layout/DashboardLayout';
+import Button from '@/components/ui/Button';
+import DisclaimerBanner from '@/components/features/DisclaimerBanner';
+import EmergencyAlertModal from '@/components/features/EmergencyAlertModal';
+import { copilotService } from '@/services/copilot.service';
+import { useToast } from '@/hooks/useToast';
 
 interface CopilotMessage {
   id: string;
@@ -35,30 +29,37 @@ interface CopilotMessage {
 }
 
 export default function CopilotPage() {
+  const [searchParams] = useSearchParams();
+  const initialQuery = searchParams.get('q');
+  
   const [messages, setMessages] = useState<CopilotMessage[]>([
     {
       id: 'welcome',
       role: 'assistant',
-      content: 'Hello! I am your **AI Health Copilot**. I analyze your assessments, daily logs, active goals, medical reports, and family history to provide personalized preventive health guidance.\n\nHow can I help optimize your health today?',
+      content: 'Hello! I am your **GeneGuard AI Assistant**. I synthesize your genetic traits, diagnostic reports, and biometric trends to answer your preventive health questions.\n\nWhat would you like to explore today?',
       suggestedActions: [
-        'Analyze my last 7 days of metrics',
-        'Review my cardiovascular and diabetes risk',
-        'Formulate questions for my next doctor appointment',
-        'Recommend adjustments to my daily hydration & sleep'
+        'Explain my latest report',
+        'What do my results mean?',
+        'Summarize my genetic profile',
+        'How can I improve my health score?'
       ],
       timestamp: new Date().toISOString()
     }
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [loading, setLoading] = useState(false);
-  const [contextSummary, setContextSummary] = useState<CopilotContextSummary | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const [emergencyAlert, setEmergencyAlert] = useState<{ isOpen: boolean; message?: string; type?: string }>({ isOpen: false });
   const { error: showError } = useToast();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const initializedQuery = useRef(false);
 
   useEffect(() => {
-    fetchContext();
-  }, []);
+    if (initialQuery && !initializedQuery.current) {
+      initializedQuery.current = true;
+      handleSend(initialQuery);
+    }
+  }, [initialQuery]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -66,13 +67,10 @@ export default function CopilotPage() {
     }
   }, [messages, loading]);
 
-  const fetchContext = async () => {
-    try {
-      const res = await copilotService.getContextSummary();
-      if (res.data) setContextSummary(res.data);
-    } catch {
-      // Ignored
-    }
+  const handleCopy = (id: string, text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
   };
 
   const handleSend = async (textToSend?: string) => {
@@ -116,13 +114,13 @@ export default function CopilotPage() {
         setMessages(prev => [...prev, aiMsg]);
       }
     } catch (err: any) {
-      showError(err.response?.data?.message || 'AI Health Copilot could not respond right now.');
+      showError(err.response?.data?.message || 'AI Assistant could not respond right now.');
       setMessages(prev => [
         ...prev,
         {
           id: `err-${Date.now()}`,
           role: 'assistant',
-          content: 'I encountered an issue processing your health query. Please verify your connection or try again in a moment.',
+          content: 'I encountered an issue processing your query. Please verify your connection or try again in a moment.',
           timestamp: new Date().toISOString()
         }
       ]);
@@ -136,140 +134,122 @@ export default function CopilotPage() {
       {
         id: 'welcome-reset',
         role: 'assistant',
-        content: 'Conversation reset. What health topic or biometrics would you like to review?',
+        content: 'Session refreshed. How can I assist you with your genetic or medical data?',
         suggestedActions: [
-          'Analyze my last 7 days of metrics',
-          'Review my cardiovascular and diabetes risk',
-          'Formulate questions for my next doctor appointment'
+          'Explain my latest report',
+          'What do my results mean?',
+          'Summarize my genetic profile'
         ],
         timestamp: new Date().toISOString()
       }
     ]);
   };
 
+  const defaultPills = [
+    'Explain my latest report',
+    'What do my results mean?',
+    'Summarize my genetic profile',
+    'How can I improve my health score?'
+  ];
+
   return (
-    <DashboardLayout title="AI Health Copilot">
-      <div className="space-y-6 max-w-5xl mx-auto pb-12">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl p-6 rounded-3xl border border-gray-200/80 dark:border-gray-800/80 shadow-sm">
+    <DashboardLayout>
+      <div className="space-y-5 max-w-4xl mx-auto pb-8">
+        
+        {/* Header (Reference Design 5) */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <div className="flex items-center gap-2 text-primary-600 dark:text-primary-400 font-semibold text-xs uppercase tracking-wider mb-1">
-              <Sparkles size={14} /> Multi-Source Clinical Assistant
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-              AI Health Copilot
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+              <span>AI Assistant</span>
+              <Sparkles size={20} className="text-indigo-600 dark:text-indigo-400" />
             </h1>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+              Ask anything about your genetics, reports, or health insights.
+            </p>
           </div>
-          <Button variant="outline" size="sm" onClick={handleClear} icon={<RotateCcw size={14} />}>
-            Reset Session
+
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleClear} 
+            icon={<RotateCcw size={13} />}
+            className="text-xs font-semibold self-start sm:self-auto"
+          >
+            New Chat
           </Button>
+        </div>
+
+        {/* Quick Suggestion Pills (Reference Design 5) */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar">
+          {defaultPills.map((pill, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => handleSend(pill)}
+              className="px-3.5 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all whitespace-nowrap shadow-xs cursor-pointer"
+            >
+              {pill}
+            </button>
+          ))}
         </div>
 
         <DisclaimerBanner />
 
-        {/* Live Patient Context Ribbon */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-          <Card glass className="p-3.5 flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-primary-100 dark:bg-primary-900/40 text-primary-600">
-              <Bot size={18} />
-            </div>
-            <div>
-              <span className="text-[10px] text-gray-400 font-bold uppercase block">Health Score</span>
-              <span className="text-sm font-extrabold text-gray-900 dark:text-white">
-                {contextSummary?.healthScore ? `${contextSummary.healthScore}/100` : 'Assessed'}
-              </span>
-            </div>
-          </Card>
-
-          <Card glass className="p-3.5 flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600">
-              <Activity size={18} />
-            </div>
-            <div>
-              <span className="text-[10px] text-gray-400 font-bold uppercase block">Daily Logs</span>
-              <span className="text-sm font-extrabold text-gray-900 dark:text-white">
-                {contextSummary?.trackingDaysCount || 0} recent days
-              </span>
-            </div>
-          </Card>
-
-          <Card glass className="p-3.5 flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-amber-100 dark:bg-amber-900/40 text-amber-600">
-              <Target size={18} />
-            </div>
-            <div>
-              <span className="text-[10px] text-gray-400 font-bold uppercase block">Active Goals</span>
-              <span className="text-sm font-extrabold text-gray-900 dark:text-white">
-                {contextSummary?.activeGoalsCount || 0} in progress
-              </span>
-            </div>
-          </Card>
-
-          <Card glass className="p-3.5 flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-purple-100 dark:bg-purple-900/40 text-purple-600">
-              <FileText size={18} />
-            </div>
-            <div>
-              <span className="text-[10px] text-gray-400 font-bold uppercase block">Lab Reports</span>
-              <span className="text-sm font-extrabold text-gray-900 dark:text-white">
-                {contextSummary?.reportsCount || 0} recorded
-              </span>
-            </div>
-          </Card>
-
-          <Card glass className="p-3.5 flex items-center gap-3 col-span-2 sm:col-span-1">
-            <div className="p-2.5 rounded-xl bg-rose-100 dark:bg-rose-900/40 text-rose-600">
-              <Users size={18} />
-            </div>
-            <div>
-              <span className="text-[10px] text-gray-400 font-bold uppercase block">Family Lineage</span>
-              <span className="text-sm font-extrabold text-gray-900 dark:text-white">
-                {contextSummary?.familyMembersCount || 0} relatives
-              </span>
-            </div>
-          </Card>
-        </div>
-
-        {/* Chat Feed */}
-        <div className="rounded-3xl border border-gray-200/80 dark:border-gray-800 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl shadow-lg flex flex-col h-[560px] overflow-hidden">
-          <div ref={scrollRef} className="flex-1 overflow-y-auto p-5 space-y-4 custom-scrollbar">
+        {/* Chat Feed Card (Reference Design 5) */}
+        <div className="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800/80 rounded-3xl shadow-sm flex flex-col h-[560px] overflow-hidden">
+          
+          {/* Scrollable Conversation Stream */}
+          <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5 custom-scrollbar">
             {messages.map((m) => (
               <div
                 key={m.id}
-                className={`flex gap-3.5 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                className={`flex gap-3 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 {m.role === 'assistant' && (
-                  <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-primary-600 to-primary-400 text-white flex items-center justify-center shrink-0 shadow-md shadow-primary-500/20">
-                    <Bot size={18} />
+                  <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-sm shadow-indigo-500/20">
+                    <Dna size={16} />
                   </div>
                 )}
 
-                <div className={`max-w-2xl space-y-2.5 ${m.role === 'user' ? 'text-right' : 'text-left'}`}>
+                <div className={`max-w-xl space-y-2 ${m.role === 'user' ? 'text-right' : 'text-left'}`}>
                   <div
-                    className={`p-4.5 rounded-2xl text-sm leading-relaxed ${
+                    className={`p-4 rounded-2xl text-xs sm:text-sm leading-relaxed transition-colors ${
                       m.role === 'user'
-                        ? 'bg-primary-600 text-white rounded-tr-none'
+                        ? 'bg-indigo-600 text-white rounded-tr-sm shadow-sm'
                         : m.isEmergency
-                        ? 'bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-red-950 dark:text-red-200 rounded-tl-none'
-                        : 'bg-white dark:bg-gray-800/90 text-gray-800 dark:text-gray-200 border border-gray-100 dark:border-gray-800 shadow-sm rounded-tl-none'
+                        ? 'bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-950 dark:text-rose-200 rounded-tl-sm'
+                        : 'bg-slate-50 dark:bg-slate-800/80 text-slate-800 dark:text-slate-200 border border-slate-200/70 dark:border-slate-700/60 rounded-tl-sm shadow-xs'
                     }`}
                   >
-                    <ReactMarkdown className="prose dark:prose-invert text-sm max-w-none prose-p:my-1 prose-headings:my-2 prose-ul:my-1">
+                    <ReactMarkdown className="prose dark:prose-invert text-xs sm:text-sm max-w-none prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-li:my-0.5">
                       {m.content}
                     </ReactMarkdown>
+
+                    {m.role === 'assistant' && (
+                      <div className="mt-2 pt-2 border-t border-slate-200/50 dark:border-slate-700/50 flex items-center justify-end gap-2 text-slate-400">
+                        <button
+                          type="button"
+                          onClick={() => handleCopy(m.id, m.content)}
+                          className="hover:text-slate-600 dark:hover:text-slate-200 transition-colors p-1"
+                          title="Copy response"
+                        >
+                          {copiedId === m.id ? <Check size={13} className="text-emerald-500" /> : <Copy size={13} />}
+                        </button>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Suggested Action Chips */}
+                  {/* Contextual Suggested Actions */}
                   {m.suggestedActions && m.suggestedActions.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 pt-1 justify-start">
                       {m.suggestedActions.map((action, idx) => (
                         <button
                           key={idx}
+                          type="button"
                           onClick={() => handleSend(action)}
-                          className="px-3 py-1.5 text-xs font-semibold rounded-xl bg-primary-50 dark:bg-primary-950/40 text-primary-700 dark:text-primary-300 border border-primary-200/60 dark:border-primary-800/40 hover:bg-primary-100 dark:hover:bg-primary-900/60 transition-all flex items-center gap-1.5"
+                          className="px-3 py-1 text-[11px] font-semibold rounded-full bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-colors"
                         >
-                          <Sparkles size={12} className="text-primary-500" />
-                          <span>{action}</span>
+                          {action}
                         </button>
                       ))}
                     </div>
@@ -277,49 +257,61 @@ export default function CopilotPage() {
                 </div>
 
                 {m.role === 'user' && (
-                  <div className="w-9 h-9 rounded-2xl bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 flex items-center justify-center shrink-0 text-xs font-bold">
-                    You
+                  <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center shrink-0 text-xs font-bold">
+                    U
                   </div>
                 )}
               </div>
             ))}
 
             {loading && (
-              <div className="flex items-center gap-3 text-gray-400 text-xs p-2">
-                <div className="w-7 h-7 rounded-xl bg-primary-100 dark:bg-primary-950 text-primary-500 flex items-center justify-center animate-pulse">
-                  <Bot size={16} />
+              <div className="flex items-center gap-3 text-slate-400 text-xs p-2">
+                <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 flex items-center justify-center animate-pulse">
+                  <Dna size={16} />
                 </div>
-                <span>GeneGuard Copilot is synthesizing your health metrics...</span>
+                <span>Analyzing your genetic & biometric context...</span>
               </div>
             )}
           </div>
 
-          {/* Chat Input */}
-          <div className="p-4 bg-white/90 dark:bg-gray-900/90 border-t border-gray-200/80 dark:border-gray-800 flex items-center gap-2">
-            <input
-              type="text"
-              placeholder="Ask your Copilot (e.g., 'How can I lower my cholesterol based on my lab results?')"
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSend();
-                }
+          {/* Bottom Chat Input Bar (Reference Design 5) */}
+          <div className="p-3 sm:p-4 bg-white dark:bg-slate-900 border-t border-slate-200/80 dark:border-slate-800">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSend();
               }}
-              disabled={loading}
-              className="flex-1 px-4 py-3 rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-primary-500/30"
-            />
-            <Button
-              onClick={() => handleSend()}
-              loading={loading}
-              disabled={!inputMessage.trim() || loading}
-              icon={<Send size={16} />}
-              className="px-5 py-3 rounded-2xl"
+              className="flex items-center gap-2"
             >
-              Ask
-            </Button>
+              <div className="flex items-center gap-2 flex-1 px-4 py-2 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus-within:ring-2 focus-within:ring-indigo-500/20 focus-within:border-indigo-500 transition-all">
+                <button
+                  type="button"
+                  title="Attach report"
+                  onClick={() => showError('Select reports via the Reports page to analyze.')}
+                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-0.5 cursor-pointer"
+                >
+                  <Paperclip size={16} />
+                </button>
+                <input
+                  type="text"
+                  placeholder="Ask a question..."
+                  value={inputMessage}
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  disabled={loading}
+                  className="w-full bg-transparent text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={!inputMessage.trim() || loading}
+                className="w-10 h-10 rounded-2xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white flex items-center justify-center shadow-sm shadow-indigo-500/20 transition-all shrink-0 cursor-pointer"
+              >
+                <Send size={15} />
+              </button>
+            </form>
           </div>
+
         </div>
 
         {/* Emergency Alert Modal */}
@@ -329,6 +321,7 @@ export default function CopilotPage() {
           message={emergencyAlert.message}
           emergencyType={emergencyAlert.type}
         />
+
       </div>
     </DashboardLayout>
   );

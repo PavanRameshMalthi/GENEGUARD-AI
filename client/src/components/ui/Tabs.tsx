@@ -2,21 +2,29 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { LucideIcon } from 'lucide-react';
 
-interface Tab {
+export interface Tab {
   id: string;
   label: string;
   icon?: LucideIcon;
+  badge?: string | number;
 }
 
-interface TabsProps {
+export interface TabsProps {
   tabs: Tab[];
   activeTab: string;
   onChange: (id: string) => void;
+  className?: string;
+  fullWidth?: boolean;
 }
 
-const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onChange }) => {
+const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onChange, className = '', fullWidth = false }) => {
   return (
-    <div className="flex space-x-1 p-1 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/30 rounded-xl shadow-xl shadow-black/5 dark:shadow-black/20 w-max overflow-x-auto">
+    <div
+      role="tablist"
+      className={`inline-flex items-center p-1 bg-slate-100 dark:bg-slate-800/90 border border-slate-200/60 dark:border-slate-700/60 rounded-xl max-w-full overflow-x-auto no-scrollbar ${
+        fullWidth ? 'w-full flex' : 'w-max'
+      } ${className}`}
+    >
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;
         const Icon = tab.icon;
@@ -24,23 +32,32 @@ const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onChange }) => {
         return (
           <button
             key={tab.id}
+            role="tab"
+            aria-selected={isActive}
             onClick={() => onChange(tab.id)}
-            className={`relative flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 ${
+            className={`relative flex items-center justify-center gap-2 px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all duration-150 select-none cursor-pointer ${
+              fullWidth ? 'flex-1' : ''
+            } ${
               isActive
-                ? 'text-primary-600 dark:text-primary-400'
-                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100/50 dark:hover:bg-gray-800/50'
+                ? 'text-slate-900 dark:text-white font-bold'
+                : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
             {isActive && (
               <motion.div
-                layoutId="activeTab"
-                className="absolute inset-0 bg-white dark:bg-gray-800 rounded-lg shadow-sm"
-                transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                layoutId="activeSegmentedTab"
+                className="absolute inset-0 bg-white dark:bg-slate-700 rounded-lg shadow-sm"
+                transition={{ type: 'spring', damping: 25, stiffness: 350 }}
               />
             )}
-            <span className="relative flex items-center gap-2 z-10">
-              {Icon && <Icon className="w-4 h-4" />}
+            <span className="relative flex items-center gap-1.5 z-10 whitespace-nowrap">
+              {Icon && <Icon className="w-3.5 h-3.5" />}
               {tab.label}
+              {tab.badge !== undefined && (
+                <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-300 font-bold">
+                  {tab.badge}
+                </span>
+              )}
             </span>
           </button>
         );

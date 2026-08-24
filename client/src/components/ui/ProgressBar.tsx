@@ -12,11 +12,19 @@ interface ProgressBarProps {
 }
 
 const colorMap: Record<string, string> = {
-  primary: 'bg-primary-500',
-  accent: 'bg-accent-500',
-  green: 'bg-emerald-500',
-  red: 'bg-rose-500',
-  yellow: 'bg-amber-500',
+  primary: 'bg-indigo-600 dark:bg-indigo-500',
+  indigo: 'bg-indigo-600 dark:bg-indigo-500',
+  accent: 'bg-indigo-500',
+  green: 'bg-emerald-500 dark:bg-emerald-400',
+  emerald: 'bg-emerald-500 dark:bg-emerald-400',
+  teal: 'bg-teal-500 dark:bg-teal-400',
+  cyan: 'bg-cyan-500 dark:bg-cyan-400',
+  red: 'bg-rose-500 dark:bg-rose-400',
+  rose: 'bg-rose-500 dark:bg-rose-400',
+  yellow: 'bg-amber-500 dark:bg-amber-400',
+  amber: 'bg-amber-500 dark:bg-amber-400',
+  purple: 'bg-purple-500 dark:bg-purple-400',
+  blue: 'bg-blue-500 dark:bg-blue-400'
 };
 
 const ProgressBar: React.FC<ProgressBarProps> = ({
@@ -32,12 +40,12 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 
   const sizeClasses = {
     sm: 'h-1.5',
-    md: 'h-2.5',
-    lg: 'h-4',
+    md: 'h-2',
+    lg: 'h-3.5',
   };
 
   const isPredefinedColor = typeof color === 'string' && colorMap[color];
-  const bgColorClass = isPredefinedColor ? colorMap[color] : 'bg-primary-500';
+  const bgColorClass = isPredefinedColor ? colorMap[color] : (typeof color === 'string' && color.startsWith('bg-') ? color : 'bg-indigo-600');
   const customStyle = !isPredefinedColor && typeof color === 'string' && color.startsWith('#')
     ? { backgroundColor: color }
     : undefined;
@@ -46,11 +54,11 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
     <div className={`w-full ${className}`}>
       {label && (
         <div className="flex justify-between mb-1">
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{label}</span>
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{Math.round(actualValue)}%</span>
+          <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">{label}</span>
+          <span className="text-xs font-bold text-slate-700 dark:text-slate-300">{Math.round(actualValue)}%</span>
         </div>
       )}
-      <div className={`w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden ${sizeClasses[size]}`}>
+      <div className={`w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden ${sizeClasses[size]}`}>
         <motion.div
           className={`h-full rounded-full ${bgColorClass}`}
           style={customStyle}

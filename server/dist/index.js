@@ -9,7 +9,7 @@ import { connectDB } from './config/db.js';
 import { ENV } from './config/env.js';
 import { syncAdminSecurity } from './services/admin-init.service.js';
 import { errorHandler } from './middleware/errorHandler.js';
-import { apiLimiter } from './middleware/rateLimiter.js';
+import { apiLimiter, aiLimiter } from './middleware/rateLimiter.js';
 import authRoutes from './routes/auth.routes.js';
 import assessmentRoutes from './routes/assessment.routes.js';
 import chatRoutes from './routes/chat.routes.js';
@@ -29,6 +29,8 @@ import familyRoutes from './routes/family.routes.js';
 import achievementRoutes from './routes/achievement.routes.js';
 import copilotRoutes from './routes/copilot.routes.js';
 const app = express();
+// Trust proxy for proper client IP resolution behind reverse proxies
+app.set('trust proxy', 1);
 // Connect to MongoDB and synchronize admin account security
 connectDB().then(() => {
     syncAdminSecurity();
@@ -39,7 +41,6 @@ app.use(helmet({
 app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
 app.use(express.json());
 app.use(mongoSanitize());
-app.use('/api', apiLimiter);
 // Serve uploads folder for report previews
 app.use('/uploads', express.static(path.resolve('uploads')));
 // Health check
@@ -47,14 +48,18 @@ app.get('/api/health', (_req, res) => {
     res.json({ success: true, message: 'GeneGuard AI API is running', timestamp: new Date().toISOString() });
 });
 // Register Core APIs
+// Auth routes have their own dedicated authLimiter with skipSuccessfulRequests
 app.use('/api/auth', authRoutes);
+// General and AI-protected routes with apiLimiter
+app.use('/api', apiLimiter);
+app.use('/api/chat', aiLimiter, chatRoutes);
+app.use('/api/ai', aiLimiter, aiRoutes);
+app.use('/api/copilot', aiLimiter, copilotRoutes);
 app.use('/api/assessments', assessmentRoutes);
-app.use('/api/chat', chatRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/recommendations', recommendationRoutes);
-app.use('/api/ai', aiRoutes);
 app.use('/api/tracking', trackingRoutes);
 app.use('/api/goals', goalsRoutes);
 app.use('/api/timeline', timelineRoutes);
@@ -65,7 +70,6 @@ app.use('/api/health/score', scoreRoutes);
 app.use('/api/calendar', calendarRoutes);
 app.use('/api/family', familyRoutes);
 app.use('/api/achievements', achievementRoutes);
-app.use('/api/copilot', copilotRoutes);
 app.use(errorHandler);
 const PORT = ENV.PORT || 5000;
 app.listen(PORT, () => {

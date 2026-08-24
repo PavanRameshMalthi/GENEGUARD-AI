@@ -12,6 +12,8 @@ const LoginPage = lazy(() => import('./pages/Auth/LoginPage'));
 const RegisterPage = lazy(() => import('./pages/Auth/RegisterPage'));
 const ForgotPasswordPage = lazy(() => import('./pages/Auth/ForgotPasswordPage'));
 const DashboardPage = lazy(() => import('./pages/Dashboard/DashboardPage'));
+const GeneticsPage = lazy(() => import('./pages/Genetics/GeneticsPage'));
+const AnalysisPage = lazy(() => import('./pages/Analysis/AnalysisPage'));
 const AssessmentPage = lazy(() => import('./pages/Assessment/AssessmentPage'));
 const AssessmentResultPage = lazy(() => import('./pages/Assessment/AssessmentResultPage'));
 const DailyTrackingPage = lazy(() => import('./pages/Tracking/DailyTrackingPage'));
@@ -61,6 +63,8 @@ const AppRoutes = () => (
       <Route path="/forgot-password" element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
       
       <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+      <Route path="/genetics" element={<ProtectedRoute><GeneticsPage /></ProtectedRoute>} />
+      <Route path="/analysis" element={<ProtectedRoute><AnalysisPage /></ProtectedRoute>} />
       <Route path="/copilot" element={<ProtectedRoute><CopilotPage /></ProtectedRoute>} />
       <Route path="/calendar" element={<ProtectedRoute><PreventiveCalendarPage /></ProtectedRoute>} />
       <Route path="/family" element={<ProtectedRoute><FamilyHealthPage /></ProtectedRoute>} />

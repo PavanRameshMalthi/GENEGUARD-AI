@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { motion } from 'framer-motion';
-import { Mail, ArrowLeft, CheckCircle } from 'lucide-react';
+import { Dna, Mail, ArrowLeft, CheckCircle } from 'lucide-react';
 import AuthLayout from '@/components/layout/AuthLayout';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import Card from '@/components/ui/Card';
-import { validateEmail } from '@/utils/validation';
+import { validateEmail, sanitizeText } from '@/utils/validation';
 
 export default function ForgotPasswordPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -19,73 +17,75 @@ export default function ForgotPasswordPage() {
     }
   });
 
-  const onSubmit = async () => {
+  const onSubmit = async (data: any) => {
     setLoading(true);
-    // Simulate API call
+    // Simulate recovery link dispatch
     setTimeout(() => {
       setLoading(false);
       setIsSubmitted(true);
-    }, 1200);
+    }, 800);
   };
 
   return (
     <AuthLayout>
-      {!isSubmitted ? (
-        <>
-          <div className="text-center mb-6">
-            <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-1.5">
-              Reset Password
-            </h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Enter your registered email address and we'll send you recovery instructions.
-            </p>
-          </div>
+      {/* Top Logo Icon */}
+      <div className="flex flex-col items-center mb-5 text-center">
+        <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-3 shadow-sm">
+          <Dna className="w-6 h-6" />
+        </div>
+        <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+          Reset Password
+        </h1>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+          Enter your email to receive recovery instructions
+        </p>
+      </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
-            <Input
-              label="Email Address"
-              type="email"
-              icon={<Mail size={18} />}
-              placeholder="name@example.com"
-              {...register('email', {
-                validate: (val) => validateEmail(val) || true
-              })}
-              error={dirtyFields.email ? (errors.email?.message as string) : undefined}
-              isSuccess={Boolean(dirtyFields.email && !errors.email)}
-              required
-            />
-            
-            <div className="pt-2">
-              <Button 
-                type="submit" 
-                className="w-full justify-center h-11 text-base font-semibold" 
-                loading={loading} 
-                disabled={!isValid || loading}
-                size="md"
-              >
-                Send Reset Link
-              </Button>
-            </div>
-          </form>
-        </>
-      ) : (
-        <div className="text-center py-4">
-          <div className="w-14 h-14 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <CheckCircle size={28} />
+      {!isSubmitted ? (
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3.5" noValidate>
+          <Input
+            label="Email"
+            type="email"
+            icon={<Mail size={16} />}
+            placeholder="name@example.com"
+            {...register('email', {
+              validate: (val) => validateEmail(val) || true
+            })}
+            error={dirtyFields.email ? (errors.email?.message as string) : undefined}
+            isSuccess={Boolean(dirtyFields.email && !errors.email)}
+            required
+          />
+          
+          <div className="pt-2">
+            <Button 
+              type="submit" 
+              className="w-full justify-center h-10.5 text-xs font-bold" 
+              loading={loading} 
+              disabled={!isValid || loading}
+              size="md"
+            >
+              Send Reset Link
+            </Button>
           </div>
-          <h2 className="text-xl font-extrabold text-slate-900 dark:text-white mb-2">
-            Check your email
+        </form>
+      ) : (
+        <div className="text-center py-4 space-y-3">
+          <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-900/40 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center mx-auto shadow-sm">
+            <CheckCircle size={24} />
+          </div>
+          <h2 className="text-base font-bold text-slate-900 dark:text-white">
+            Check your inbox
           </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">
-            We've sent recovery instructions to <strong>{getValues('email')}</strong>
+          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xs mx-auto">
+            We've sent recovery instructions to <strong className="text-slate-800 dark:text-slate-200">{getValues('email')}</strong>
           </p>
         </div>
       )}
 
-      <div className="mt-6 text-center">
-        <Link to="/login" className="inline-flex items-center text-xs text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 font-semibold transition-colors">
-          <ArrowLeft size={14} className="mr-1.5" />
-          Back to Login
+      <div className="mt-5 text-center">
+        <Link to="/login" className="inline-flex items-center text-xs text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 font-bold transition-colors">
+          <ArrowLeft size={13} className="mr-1.5" />
+          Back to Sign In
         </Link>
       </div>
     </AuthLayout>

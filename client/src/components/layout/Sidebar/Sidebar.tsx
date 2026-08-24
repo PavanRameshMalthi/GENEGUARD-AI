@@ -41,19 +41,12 @@ export const Sidebar: React.FC = () => {
   }, [toggleCollapse]);
 
   const navItems = [
-    { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
-    { icon: ClipboardList, label: 'Health Assessment', path: '/assessment' },
-    { icon: Activity, label: 'Log Today\'s Health', path: '/tracking' },
-    { icon: Target, label: 'Health Goals', path: '/goals' },
-    { icon: History, label: 'Health Timeline', path: '/timeline' },
-    { icon: FileText, label: 'Medical Reports', path: '/reports' },
-    { icon: Bot, label: 'AI Health Coach', path: '/copilot', badge: 'AI', badgeColor: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300' },
-    { icon: FileBarChart, label: 'Weekly Report', path: '/weekly-reports' },
-    { icon: Calendar, label: 'Preventive Calendar', path: '/calendar' },
-    { icon: Dna, label: 'Family Factors', path: '/family' },
-    { icon: Trophy, label: 'Achievements', path: '/achievements' },
-    { icon: MessageSquare, label: 'AI Chat', path: '/chat', badge: 'AI' },
-    { icon: Settings, label: 'Settings', path: '/settings' },
+    { icon: LayoutDashboard, label: 'Overview', path: '/dashboard' },
+    { icon: Bot, label: 'AI Assistant', path: '/copilot', badge: 'AI', badgeColor: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300' },
+    { icon: Dna, label: 'Genetics', path: '/genetics' },
+    { icon: Activity, label: 'Analysis', path: '/analysis' },
+    { icon: FileText, label: 'Reports', path: '/reports' },
+    { icon: History, label: 'History', path: '/timeline' },
   ];
 
   const adminItems = [
