@@ -270,7 +270,10 @@ flowchart TD
 **Affiliated University**: Adikavi Nannaya University
 
 ---
+<<<<<<< HEAD
 
 ## 📄 License
 
 This project is licensed under the **MIT License**.
+=======
+>>>>>>> f85d22ef619f7aeb699680d7d515f81f0e90ffa8
