@@ -55,29 +55,30 @@ const Modal: React.FC<ModalProps> = ({
             className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
             onClick={onClose}
           />
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 pointer-events-none">
             <motion.div
               initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className={`w-full ${sizes[size]} pointer-events-auto`}
+              className={`w-full ${sizes[size]} pointer-events-auto my-auto max-h-[90vh] flex flex-col`}
             >
-              <Card glass padding="none" className="overflow-hidden">
-                <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700/50">
+              <Card glass padding="none" className="overflow-hidden flex flex-col max-h-[90vh] shadow-2xl">
+                <div className="flex items-center justify-between px-6 py-4 sm:px-8 sm:py-5 border-b border-gray-100 dark:border-gray-700/50 shrink-0">
                   {title && (
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                    <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
                       {title}
                     </h3>
                   )}
                   <button
                     onClick={onClose}
+                    aria-label="Close modal"
                     className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
                   >
                     <X size={20} />
                   </button>
                 </div>
-                <div className="p-6">{children}</div>
+                <div className="p-6 sm:p-8 overflow-y-auto flex-1">{children}</div>
               </Card>
             </motion.div>
           </div>

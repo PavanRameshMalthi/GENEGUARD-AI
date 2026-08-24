@@ -135,34 +135,34 @@ const DailyTrackingModal: React.FC<DailyTrackingModalProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Log Daily Health Tracking" size="lg">
+    <Modal isOpen={isOpen} onClose={onClose} title="Log Today's Health" size="lg">
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Date Selector */}
         <div>
-          <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1.5">
-            Tracking Date
-          </label>
-          <input
+          <Input
+            label="Tracking Date"
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
             max={today}
-            className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500/30 text-sm"
+            required
           />
         </div>
 
         {/* 1. Hydration Section */}
-        <div className="p-4 rounded-2xl bg-cyan-50/40 dark:bg-cyan-950/20 border border-cyan-100 dark:border-cyan-900/30 space-y-3">
-          <div className="flex items-center gap-2 text-cyan-700 dark:text-cyan-400 font-bold text-sm">
-            <Droplet size={18} /> Hydration Tracking
+        <div className="p-4 sm:p-5 rounded-2xl bg-cyan-50/50 dark:bg-cyan-950/20 border border-cyan-100 dark:border-cyan-900/30 space-y-4">
+          <div className="flex items-center gap-2 text-cyan-700 dark:text-cyan-400 font-semibold text-sm">
+            <Droplet size={18} />
+            <span>Hydration</span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
               label="Water Consumed (Liters)"
               type="number"
               step="0.1"
               min="0"
               max="20"
+              placeholder="e.g. 2.0"
               value={waterConsumed}
               onChange={(e) => setWaterConsumed(parseFloat(e.target.value) || 0)}
               required
@@ -173,6 +173,7 @@ const DailyTrackingModal: React.FC<DailyTrackingModalProps> = ({
               step="0.1"
               min="0.5"
               max="20"
+              placeholder="e.g. 2.5"
               value={waterGoal}
               onChange={(e) => setWaterGoal(parseFloat(e.target.value) || 2.5)}
               required
@@ -181,11 +182,12 @@ const DailyTrackingModal: React.FC<DailyTrackingModalProps> = ({
         </div>
 
         {/* 2. Sleep Section */}
-        <div className="p-4 rounded-2xl bg-indigo-50/40 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/30 space-y-3">
-          <div className="flex items-center gap-2 text-indigo-700 dark:text-indigo-400 font-bold text-sm">
-            <Moon size={18} /> Sleep Architecture
+        <div className="p-4 sm:p-5 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/30 space-y-4">
+          <div className="flex items-center gap-2 text-indigo-700 dark:text-indigo-400 font-semibold text-sm">
+            <Moon size={18} />
+            <span>Sleep</span>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
               label="Bedtime"
               type="time"
@@ -201,21 +203,23 @@ const DailyTrackingModal: React.FC<DailyTrackingModalProps> = ({
               required
             />
             <Input
-              label="Total Sleep (hrs)"
+              label="Total Sleep (Hours)"
               type="number"
               step="0.5"
               min="0"
               max="24"
+              placeholder="e.g. 7.5"
               value={totalSleep}
               onChange={(e) => setTotalSleep(parseFloat(e.target.value) || 0)}
               required
             />
             <Input
-              label="Sleep Goal (hrs)"
+              label="Sleep Goal (Hours)"
               type="number"
               step="0.5"
               min="4"
               max="14"
+              placeholder="e.g. 8.0"
               value={sleepGoal}
               onChange={(e) => setSleepGoal(parseFloat(e.target.value) || 8)}
               required
@@ -224,25 +228,28 @@ const DailyTrackingModal: React.FC<DailyTrackingModalProps> = ({
         </div>
 
         {/* 3. Physical Activity */}
-        <div className="p-4 rounded-2xl bg-emerald-50/40 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 space-y-3">
-          <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400 font-bold text-sm">
-            <Activity size={18} /> Physical Activity & Exercise
+        <div className="p-4 sm:p-5 rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 space-y-4">
+          <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400 font-semibold text-sm">
+            <Activity size={18} />
+            <span>Physical Activity</span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
               label="Daily Steps Count"
               type="number"
               min="0"
               max="100000"
+              placeholder="e.g. 6000"
               value={steps}
               onChange={(e) => setSteps(parseInt(e.target.value) || 0)}
               required
             />
             <Input
-              label="Walking Duration (minutes)"
+              label="Walking Duration (Minutes)"
               type="number"
               min="0"
               max="600"
+              placeholder="e.g. 30"
               value={walkingMinutes}
               onChange={(e) => setWalkingMinutes(parseInt(e.target.value) || 0)}
             />
@@ -254,10 +261,11 @@ const DailyTrackingModal: React.FC<DailyTrackingModalProps> = ({
               placeholder="e.g. Jogging, Yoga, Gym"
             />
             <Input
-              label="Exercise Duration (minutes)"
+              label="Exercise Duration (Minutes)"
               type="number"
               min="0"
               max="300"
+              placeholder="e.g. 30"
               value={exerciseDuration}
               onChange={(e) => setExerciseDuration(parseInt(e.target.value) || 0)}
             />
@@ -265,38 +273,21 @@ const DailyTrackingModal: React.FC<DailyTrackingModalProps> = ({
         </div>
 
         {/* 4. Nutrition Section */}
-        <div className="p-4 rounded-2xl bg-amber-50/40 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/30 space-y-3">
-          <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400 font-bold text-sm">
-            <Apple size={18} /> Daily Nutrition
+        <div className="p-4 sm:p-5 rounded-2xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/30 space-y-4">
+          <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400 font-semibold text-sm">
+            <Apple size={18} />
+            <span>Nutrition</span>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
               label="Total Meals"
               type="number"
               min="1"
               max="10"
+              placeholder="e.g. 3"
               value={mealsCount}
               onChange={(e) => setMealsCount(parseInt(e.target.value) || 3)}
             />
-            <Input
-              label="Fruit Servings"
-              type="number"
-              min="0"
-              max="20"
-              value={fruitsServings}
-              onChange={(e) => setFruitsServings(parseInt(e.target.value) || 0)}
-            />
-            <Input
-              label="Vegetable Servings"
-              type="number"
-              min="0"
-              max="20"
-              value={vegetablesServings}
-              onChange={(e) => setVegetablesServings(parseInt(e.target.value) || 0)}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
             <Select
               label="Sugar Intake Level"
               value={sugarIntake}
@@ -307,52 +298,50 @@ const DailyTrackingModal: React.FC<DailyTrackingModalProps> = ({
                 { value: 'high', label: 'High (Excessive Sugar)' }
               ]}
             />
-            <div className="flex items-center gap-2 pt-6">
-              <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 font-medium cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={fastFood}
-                  onChange={(e) => setFastFood(e.target.checked)}
-                  className="rounded text-primary-600 focus:ring-primary-500 h-4 w-4"
-                />
-                Had fast food / ultra-processed meals today
-              </label>
-            </div>
+            <Input
+              label="Fruit Servings"
+              type="number"
+              min="0"
+              max="20"
+              placeholder="e.g. 2"
+              value={fruitsServings}
+              onChange={(e) => setFruitsServings(parseInt(e.target.value) || 0)}
+            />
+            <Input
+              label="Vegetable Servings"
+              type="number"
+              min="0"
+              max="20"
+              placeholder="e.g. 3"
+              value={vegetablesServings}
+              onChange={(e) => setVegetablesServings(parseInt(e.target.value) || 0)}
+            />
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border border-amber-200/60 dark:border-amber-900/40 flex items-center gap-3">
+            <input
+              type="checkbox"
+              id="fastFood"
+              checked={fastFood}
+              onChange={(e) => setFastFood(e.target.checked)}
+              className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 cursor-pointer"
+            />
+            <label
+              htmlFor="fastFood"
+              className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer select-none"
+            >
+              Had fast food or ultra-processed meals today
+            </label>
           </div>
         </div>
 
-        {/* 5. Wellness & Mood */}
-        <div className="p-4 rounded-2xl bg-rose-50/40 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 space-y-3">
-          <div className="flex items-center gap-2 text-rose-700 dark:text-rose-400 font-bold text-sm">
-            <Heart size={18} /> Wellness & Stress
+        {/* 5. Stress / Wellness */}
+        <div className="p-4 sm:p-5 rounded-2xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 space-y-4">
+          <div className="flex items-center gap-2 text-rose-700 dark:text-rose-400 font-semibold text-sm">
+            <Heart size={18} />
+            <span>Stress / Wellness</span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                Stress Level ({stressLevel}/10)
-              </label>
-              <input
-                type="range"
-                min="1"
-                max="10"
-                value={stressLevel}
-                onChange={(e) => setStressLevel(parseInt(e.target.value))}
-                className="w-full accent-rose-500"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                Energy Level ({energyLevel}/10)
-              </label>
-              <input
-                type="range"
-                min="1"
-                max="10"
-                value={energyLevel}
-                onChange={(e) => setEnergyLevel(parseInt(e.target.value))}
-                className="w-full accent-primary-500"
-              />
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Select
               label="Overall Mood"
               value={mood}
@@ -365,28 +354,78 @@ const DailyTrackingModal: React.FC<DailyTrackingModalProps> = ({
                 { value: 'stressed', label: '😫 Stressed' }
               ]}
             />
+
+            <div className="w-full flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center justify-between">
+                <span>Stress Level</span>
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-900/50 text-rose-700 dark:text-rose-300">
+                  {stressLevel} / 10
+                </span>
+              </label>
+              <div className="h-[42px] px-4 rounded-lg border border-gray-200 dark:border-gray-700/30 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl flex items-center">
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  value={stressLevel}
+                  onChange={(e) => setStressLevel(parseInt(e.target.value))}
+                  className="w-full accent-rose-500 cursor-pointer"
+                  aria-label="Stress Level"
+                />
+              </div>
+            </div>
+
+            <div className="w-full flex flex-col gap-1.5 sm:col-span-2">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center justify-between">
+                <span>Energy Level</span>
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300">
+                  {energyLevel} / 10
+                </span>
+              </label>
+              <div className="h-[42px] px-4 rounded-lg border border-gray-200 dark:border-gray-700/30 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl flex items-center">
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  value={energyLevel}
+                  onChange={(e) => setEnergyLevel(parseInt(e.target.value))}
+                  className="w-full accent-emerald-500 cursor-pointer"
+                  aria-label="Energy Level"
+                />
+              </div>
+            </div>
           </div>
-          <div>
-            <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+
+          <div className="w-full flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Personal Wellness Notes (Optional)
             </label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="How are you feeling today? Any specific symptoms or achievements?"
-              rows={2}
-              className="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-xs focus:ring-2 focus:ring-primary-500/30"
+              placeholder="How are you feeling today? Any specific symptoms, triggers, or achievements?"
+              rows={3}
+              className="w-full rounded-lg border border-gray-200 dark:border-gray-700/30 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all duration-300 resize-none"
             />
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex justify-end gap-3 pt-2">
-          <Button variant="outline" type="button" onClick={onClose}>
+        <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-800/60">
+          <Button
+            variant="outline"
+            type="button"
+            onClick={onClose}
+            className="w-full sm:w-auto justify-center"
+          >
             Cancel
           </Button>
-          <Button type="submit" loading={loading}>
-            Save Daily Tracking
+          <Button
+            type="submit"
+            loading={loading}
+            className="w-full sm:w-auto justify-center"
+          >
+            Save Health Data
           </Button>
         </div>
       </form>
