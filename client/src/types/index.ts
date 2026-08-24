@@ -261,26 +261,34 @@ export interface DailyTracking {
     wakeUpTime: string;
     totalSleep: number;
     sleepGoal: number;
+    quality?: string;
+    wokeUpDuringNight?: boolean;
   };
   physicalActivity: {
     steps: number;
     walkingMinutes: number;
     exerciseType: string;
     exerciseDuration: number;
+    exerciseIntensity?: string;
   };
   nutrition: {
     mealsCount: number;
     mealsNotes?: string;
     fruitsServings: number;
     vegetablesServings: number;
-    fastFood: boolean;
+    fastFood: boolean | string;
     sugarIntake: 'low' | 'moderate' | 'high';
+    proteinIntake?: number;
   };
   wellness: {
     stressLevel: number;
-    mood: 'great' | 'good' | 'neutral' | 'tired' | 'stressed';
+    mood: 'great' | 'good' | 'neutral' | 'tired' | 'stressed' | string;
     energyLevel: number;
     notes?: string;
+    weight?: number;
+    restingHeartRate?: number;
+    screenTime?: number;
+    overallFeeling?: string;
   };
   createdAt?: string;
   updatedAt?: string;

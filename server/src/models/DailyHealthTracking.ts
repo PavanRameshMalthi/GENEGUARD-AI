@@ -13,26 +13,34 @@ export interface IDailyHealthTracking extends mongoose.Document {
     wakeUpTime: string; // 'HH:MM'
     totalSleep: number; // in hours
     sleepGoal: number; // in hours
+    quality?: string;
+    wokeUpDuringNight?: boolean;
   };
   physicalActivity: {
     steps: number;
     walkingMinutes: number;
     exerciseType: string;
     exerciseDuration: number; // in minutes
+    exerciseIntensity?: string;
   };
   nutrition: {
     mealsCount: number;
     mealsNotes?: string;
     fruitsServings: number;
     vegetablesServings: number;
-    fastFood: boolean;
+    fastFood: boolean | string;
     sugarIntake: 'low' | 'moderate' | 'high';
+    proteinIntake?: number;
   };
   wellness: {
     stressLevel: number; // 1-10
-    mood: 'great' | 'good' | 'neutral' | 'tired' | 'stressed';
+    mood: 'great' | 'good' | 'neutral' | 'tired' | 'stressed' | string;
     energyLevel: number; // 1-10
     notes?: string;
+    weight?: number;
+    restingHeartRate?: number;
+    screenTime?: number;
+    overallFeeling?: string;
   };
   createdAt: Date;
   updatedAt: Date;
@@ -50,27 +58,35 @@ const dailyHealthTrackingSchema = new mongoose.Schema<IDailyHealthTracking>({
     bedtime: { type: String, default: '23:00' },
     wakeUpTime: { type: String, default: '07:00' },
     totalSleep: { type: Number, default: 0, min: 0, max: 24 },
-    sleepGoal: { type: Number, default: 8, min: 4, max: 14 }
+    sleepGoal: { type: Number, default: 8, min: 4, max: 14 },
+    quality: { type: String, default: 'good' },
+    wokeUpDuringNight: { type: Boolean, default: false }
   },
   physicalActivity: {
     steps: { type: Number, default: 0, min: 0, max: 100000 },
     walkingMinutes: { type: Number, default: 0, min: 0, max: 1440 },
     exerciseType: { type: String, default: 'General Activity', trim: true },
-    exerciseDuration: { type: Number, default: 0, min: 0, max: 1440 }
+    exerciseDuration: { type: Number, default: 0, min: 0, max: 1440 },
+    exerciseIntensity: { type: String, default: 'moderate' }
   },
   nutrition: {
     mealsCount: { type: Number, default: 3, min: 0, max: 10 },
     mealsNotes: { type: String, default: '', trim: true, maxlength: 500 },
     fruitsServings: { type: Number, default: 0, min: 0, max: 30 },
     vegetablesServings: { type: Number, default: 0, min: 0, max: 30 },
-    fastFood: { type: Boolean, default: false },
-    sugarIntake: { type: String, enum: ['low', 'moderate', 'high'], default: 'moderate' }
+    fastFood: { type: mongoose.Schema.Types.Mixed, default: false },
+    sugarIntake: { type: String, enum: ['low', 'moderate', 'high'], default: 'moderate' },
+    proteinIntake: { type: Number, default: 0, min: 0, max: 500 }
   },
   wellness: {
     stressLevel: { type: Number, default: 5, min: 1, max: 10 },
-    mood: { type: String, enum: ['great', 'good', 'neutral', 'tired', 'stressed'], default: 'good' },
+    mood: { type: String, default: 'good' },
     energyLevel: { type: Number, default: 7, min: 1, max: 10 },
-    notes: { type: String, default: '', trim: true, maxlength: 1000 }
+    notes: { type: String, default: '', trim: true, maxlength: 1000 },
+    weight: { type: Number, min: 0, max: 500 },
+    restingHeartRate: { type: Number, min: 0, max: 250 },
+    screenTime: { type: Number, default: 0, min: 0, max: 24 },
+    overallFeeling: { type: String, default: 'good' }
   }
 }, { timestamps: true });
 
