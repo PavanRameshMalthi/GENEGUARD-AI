@@ -150,7 +150,7 @@ const DailyTrackingModal: React.FC<DailyTrackingModalProps> = ({
         </div>
 
         {/* 1. Hydration Section */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-cyan-50/50 dark:bg-cyan-950/20 border border-cyan-100 dark:border-cyan-900/30 space-y-4">
+        <div className="p-4 sm:p-5 rounded-2xl bg-cyan-50/40 dark:bg-cyan-950/20 border border-cyan-100/80 dark:border-cyan-900/30 space-y-4">
           <div className="flex items-center gap-2 text-cyan-700 dark:text-cyan-400 font-semibold text-sm">
             <Droplet size={18} />
             <span>Hydration</span>
@@ -182,7 +182,7 @@ const DailyTrackingModal: React.FC<DailyTrackingModalProps> = ({
         </div>
 
         {/* 2. Sleep Section */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/30 space-y-4">
+        <div className="p-4 sm:p-5 rounded-2xl bg-indigo-50/40 dark:bg-indigo-950/20 border border-indigo-100/80 dark:border-indigo-900/30 space-y-4">
           <div className="flex items-center gap-2 text-indigo-700 dark:text-indigo-400 font-semibold text-sm">
             <Moon size={18} />
             <span>Sleep</span>
@@ -228,7 +228,7 @@ const DailyTrackingModal: React.FC<DailyTrackingModalProps> = ({
         </div>
 
         {/* 3. Physical Activity */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 space-y-4">
+        <div className="p-4 sm:p-5 rounded-2xl bg-emerald-50/40 dark:bg-emerald-950/20 border border-emerald-100/80 dark:border-emerald-900/30 space-y-4">
           <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400 font-semibold text-sm">
             <Activity size={18} />
             <span>Physical Activity</span>
@@ -258,7 +258,7 @@ const DailyTrackingModal: React.FC<DailyTrackingModalProps> = ({
               type="text"
               value={exerciseType}
               onChange={(e) => setExerciseType(e.target.value)}
-              placeholder="e.g. Jogging, Yoga, Gym"
+              placeholder="e.g. Brisk Walking, Yoga"
             />
             <Input
               label="Exercise Duration (Minutes)"
@@ -273,7 +273,7 @@ const DailyTrackingModal: React.FC<DailyTrackingModalProps> = ({
         </div>
 
         {/* 4. Nutrition Section */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/30 space-y-4">
+        <div className="p-4 sm:p-5 rounded-2xl bg-amber-50/40 dark:bg-amber-950/20 border border-amber-100/80 dark:border-amber-900/30 space-y-4">
           <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400 font-semibold text-sm">
             <Apple size={18} />
             <span>Nutrition</span>
@@ -318,17 +318,17 @@ const DailyTrackingModal: React.FC<DailyTrackingModalProps> = ({
             />
           </div>
 
-          <div className="p-3.5 rounded-xl bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border border-amber-200/60 dark:border-amber-900/40 flex items-center gap-3">
+          <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-amber-200/60 dark:border-amber-900/40 flex items-center gap-3">
             <input
               type="checkbox"
               id="fastFood"
               checked={fastFood}
               onChange={(e) => setFastFood(e.target.checked)}
-              className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 cursor-pointer"
+              className="h-4 w-4 rounded border-slate-300 dark:border-slate-600 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
             />
             <label
               htmlFor="fastFood"
-              className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer select-none"
+              className="text-sm font-medium text-slate-700 dark:text-slate-300 cursor-pointer select-none"
             >
               Had fast food or ultra-processed meals today
             </label>
@@ -336,7 +336,7 @@ const DailyTrackingModal: React.FC<DailyTrackingModalProps> = ({
         </div>
 
         {/* 5. Stress / Wellness */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 space-y-4">
+        <div className="p-4 sm:p-5 rounded-2xl bg-rose-50/40 dark:bg-rose-950/20 border border-rose-100/80 dark:border-rose-900/30 space-y-4">
           <div className="flex items-center gap-2 text-rose-700 dark:text-rose-400 font-semibold text-sm">
             <Heart size={18} />
             <span>Stress / Wellness</span>
@@ -356,13 +356,13 @@ const DailyTrackingModal: React.FC<DailyTrackingModalProps> = ({
             />
 
             <div className="w-full flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center justify-between">
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center justify-between">
                 <span>Stress Level</span>
-                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-900/50 text-rose-700 dark:text-rose-300">
+                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-rose-100 dark:bg-rose-900/50 text-rose-700 dark:text-rose-300">
                   {stressLevel} / 10
                 </span>
               </label>
-              <div className="h-[42px] px-4 rounded-lg border border-gray-200 dark:border-gray-700/30 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl flex items-center">
+              <div className="h-[42px] px-4 rounded-xl border border-slate-200 dark:border-slate-700/60 bg-white dark:bg-slate-900 flex items-center">
                 <input
                   type="range"
                   min="1"
@@ -376,13 +376,13 @@ const DailyTrackingModal: React.FC<DailyTrackingModalProps> = ({
             </div>
 
             <div className="w-full flex flex-col gap-1.5 sm:col-span-2">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center justify-between">
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center justify-between">
                 <span>Energy Level</span>
-                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300">
+                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300">
                   {energyLevel} / 10
                 </span>
               </label>
-              <div className="h-[42px] px-4 rounded-lg border border-gray-200 dark:border-gray-700/30 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl flex items-center">
+              <div className="h-[42px] px-4 rounded-xl border border-slate-200 dark:border-slate-700/60 bg-white dark:bg-slate-900 flex items-center">
                 <input
                   type="range"
                   min="1"
@@ -397,21 +397,21 @@ const DailyTrackingModal: React.FC<DailyTrackingModalProps> = ({
           </div>
 
           <div className="w-full flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
               Personal Wellness Notes (Optional)
             </label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="How are you feeling today? Any specific symptoms, triggers, or achievements?"
+              placeholder="How are you feeling today? Any specific symptoms or achievements?"
               rows={3}
-              className="w-full rounded-lg border border-gray-200 dark:border-gray-700/30 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all duration-300 resize-none"
+              className="w-full rounded-xl border border-slate-200 dark:border-slate-700/60 bg-white dark:bg-slate-900 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-colors duration-200 resize-none"
             />
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-800/60">
+        {/* Action Buttons (Sticky Footer) */}
+        <div className="sticky bottom-0 -mx-5 sm:-mx-7 -mb-5 sm:-mb-7 px-5 sm:px-7 py-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200/80 dark:border-slate-800 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 z-10">
           <Button
             variant="outline"
             type="button"

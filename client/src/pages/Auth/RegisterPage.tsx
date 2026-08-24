@@ -52,100 +52,99 @@ export default function RegisterPage() {
 
   return (
     <AuthLayout>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md mx-auto my-8"
-      >
-        <Card glass padding="lg" className="shadow-2xl">
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold mb-2">Create an Account</h1>
-            <p className="text-gray-600 dark:text-gray-400">Join GeneGuard AI for better health</p>
-          </div>
+      <div className="text-center mb-6">
+        <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-1.5">
+          Create Account
+        </h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400">
+          Join GeneGuard AI for predictive health intelligence
+        </p>
+      </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
-            <Input
-              label="Full Name"
-              type="text"
-              icon={<User size={18} />}
-              placeholder="John Doe"
-              {...register('name', {
-                validate: (val) => validateName(val) || true
-              })}
-              error={dirtyFields.name ? (errors.name?.message as string) : undefined}
-              isSuccess={Boolean(dirtyFields.name && !errors.name)}
-              required
-            />
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3.5" noValidate>
+        <Input
+          label="Full Name"
+          type="text"
+          icon={<User size={18} />}
+          placeholder="Jane Doe"
+          {...register('name', {
+            validate: (val) => validateName(val) || true
+          })}
+          error={dirtyFields.name ? (errors.name?.message as string) : undefined}
+          isSuccess={Boolean(dirtyFields.name && !errors.name)}
+          required
+        />
 
-            <Input
-              label="Email Address"
-              type="email"
-              icon={<Mail size={18} />}
-              placeholder="you@example.com"
-              {...register('email', {
-                validate: (val) => validateEmail(val) || true
-              })}
-              error={dirtyFields.email ? (errors.email?.message as string) : undefined}
-              isSuccess={Boolean(dirtyFields.email && !errors.email)}
-              required
-            />
-            
-            <div className="relative">
-              <Input
-                label="Password"
-                type={showPassword ? 'text' : 'password'}
-                icon={<Lock size={18} />}
-                placeholder="••••••••"
-                {...register('password', {
-                  validate: (val) => validatePassword(val) || true
-                })}
-                error={dirtyFields.password ? (errors.password?.message as string) : undefined}
-                isSuccess={Boolean(dirtyFields.password && !errors.password)}
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-9 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
-                tabIndex={-1}
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
+        <Input
+          label="Email Address"
+          type="email"
+          icon={<Mail size={18} />}
+          placeholder="name@example.com"
+          {...register('email', {
+            validate: (val) => validateEmail(val) || true
+          })}
+          error={dirtyFields.email ? (errors.email?.message as string) : undefined}
+          isSuccess={Boolean(dirtyFields.email && !errors.email)}
+          required
+        />
+        
+        <div className="relative">
+          <Input
+            label="Password"
+            type={showPassword ? 'text' : 'password'}
+            icon={<Lock size={18} />}
+            placeholder="••••••••"
+            {...register('password', {
+              validate: (val) => validatePassword(val) || true
+            })}
+            error={dirtyFields.password ? (errors.password?.message as string) : undefined}
+            isSuccess={Boolean(dirtyFields.password && !errors.password)}
+            required
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-[38px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors p-1"
+            tabIndex={-1}
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+          >
+            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+          </button>
+        </div>
 
-            <Input
-              label="Confirm Password"
-              type={showPassword ? 'text' : 'password'}
-              icon={<Lock size={18} />}
-              placeholder="••••••••"
-              {...register('confirmPassword', { 
-                required: '❌ Please confirm your password.',
-                validate: value => value === password || '❌ Passwords do not match.'
-              })}
-              error={dirtyFields.confirmPassword ? (errors.confirmPassword?.message as string) : undefined}
-              isSuccess={Boolean(dirtyFields.confirmPassword && !errors.confirmPassword && password)}
-              required
-            />
+        <Input
+          label="Confirm Password"
+          type={showPassword ? 'text' : 'password'}
+          icon={<Lock size={18} />}
+          placeholder="••••••••"
+          {...register('confirmPassword', { 
+            required: 'Please confirm your password.',
+            validate: value => value === password || 'Passwords do not match.'
+          })}
+          error={dirtyFields.confirmPassword ? (errors.confirmPassword?.message as string) : undefined}
+          isSuccess={Boolean(dirtyFields.confirmPassword && !errors.confirmPassword && password)}
+          required
+        />
 
-            <Button 
-              type="submit" 
-              className="w-full mt-6" 
-              loading={loading} 
-              disabled={!isValid || loading}
-              size="lg"
-            >
-              Register
-            </Button>
-          </form>
+        <div className="pt-2">
+          <Button 
+            type="submit" 
+            className="w-full justify-center h-11 text-base font-semibold" 
+            loading={loading} 
+            disabled={!isValid || loading}
+            size="md"
+          >
+            Create Account
+          </Button>
+        </div>
+      </form>
 
-          <p className="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
-            Already have an account?{' '}
-            <Link to="/login" className="text-primary-600 hover:text-primary-500 font-medium">
-              Log in here
-            </Link>
-          </p>
-        </Card>
-      </motion.div>
+      <p className="mt-6 text-center text-xs text-slate-500 dark:text-slate-400">
+        Already have an account?{' '}
+        <Link to="/login" className="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold">
+          Sign in
+        </Link>
+      </p>
     </AuthLayout>
   );
 }

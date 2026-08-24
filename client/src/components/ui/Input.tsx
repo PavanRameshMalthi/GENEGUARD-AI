@@ -100,19 +100,19 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     };
 
     return (
-      <div className="w-full flex flex-col gap-1.5">
+      <div className="w-full flex flex-col gap-1">
         {label && (
           <label
             htmlFor={inputId}
-            className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center justify-between"
+            className="text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center justify-between"
           >
             <span>{label}</span>
-            {props.required && <span className="text-red-500 text-xs font-normal">*Required</span>}
+            {props.required && <span className="text-rose-500 text-[10px] font-medium lowercase">*required</span>}
           </label>
         )}
         <div className="relative flex items-center">
           {icon && (
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none">
+            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none">
               {icon}
             </div>
           )}
@@ -124,25 +124,25 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             onPaste={handlePaste}
             aria-invalid={Boolean(error)}
             aria-describedby={error ? errorId : helperText ? helperId : undefined}
-            className={`w-full rounded-lg border bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl transition-all duration-300 px-4 py-2 outline-none dark:text-white ${
+            className={`w-full h-11 rounded-xl border bg-white dark:bg-slate-900 transition-colors duration-200 px-3.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none ${
               icon ? 'pl-10' : ''
             } ${
               error || (isSuccess && !icon) ? 'pr-10' : ''
             } ${
               error
-                ? 'border-red-500 ring-1 ring-red-500/30 focus:border-red-500 focus:ring-2 focus:ring-red-500/20'
+                ? 'border-rose-500 ring-1 ring-rose-500/30 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20'
                 : isSuccess
                 ? 'border-emerald-500 ring-1 ring-emerald-500/30 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20'
-                : 'border-gray-200 dark:border-gray-700/30 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20'
+                : 'border-slate-200 dark:border-slate-700/60 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20'
             } disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
             {...props}
           />
           {error ? (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-red-500 pointer-events-none">
+            <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-rose-500 pointer-events-none">
               <AlertCircle size={18} />
             </div>
           ) : isSuccess ? (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-500 pointer-events-none">
+            <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-emerald-500 pointer-events-none">
               <CheckCircle2 size={18} />
             </div>
           ) : null}
